@@ -16,7 +16,7 @@ export class Lexer {
       this.start = this.current;
       this.scanToken();
     }
-    
+
     this.tokens.push(new Token(TokenType.EOF, "", null, this.line));
     return this.tokens;
   }
@@ -62,6 +62,18 @@ export class Lexer {
         // This is Comment logic: If current is not at new line and current is not at the end then current will skip that part of code
         if (this.match("/")) {
           while (this.peek() != "\n" && !this.isAtEnd()) this.advance();
+          
+          // Multi-line comment
+        } else if (this.match("*")) {
+          this.advance(); // Advance past the '*' after '/'
+          while (!this.isAtEnd()) {
+            if (this.peek() == "*" && this.peekNext() == "/") {
+              this.advance(); // Advance past the '*'
+              this.advance(); // Advance past the '/'
+              break; // Exit the comment block
+            }
+            this.advance();
+          }
         } else {
           this.addToken(TokenType.SLASH);
         }
@@ -98,17 +110,15 @@ export class Lexer {
       case '"':
         this.string();
         break;
-      
+
       // If character is not recognised it will throw this error
       default:
         // Number literals
         if (this.isDigit(c)) {
           this.number();
-        } 
-				else if(this.isAlpha(c)){
-					this.identifier();
-				}
-				else {
+        } else if (this.isAlpha(c)) {
+          this.identifier();
+        } else {
           Error.error(this.line, "Unexpected character.");
           break;
         }
@@ -154,16 +164,14 @@ export class Lexer {
     return c >= "0" && c <= "9";
   }
 
-	// Anything starting with letter and underscore is an identifier
-	private isAlpha(c : string) : boolean{
-		return (c >= 'a' && c <= 'z') ||
-		(c >= 'A' && c <= 'Z') ||
-		 c == '_';
-	}
+  // Anything starting with letter and underscore is an identifier
+  private isAlpha(c: string): boolean {
+    return (c >= "a" && c <= "z") || (c >= "A" && c <= "Z") || c == "_";
+  }
 
-	private isAlphaNumeric(c : string): boolean{
-		return this.isAlpha(c) || this.isDigit(c);
-	}
+  private isAlphaNumeric(c: string): boolean {
+    return this.isAlpha(c) || this.isDigit(c);
+  }
 
   private string(): void {
     // Loop untill it finds " or gets at the end of line
@@ -205,14 +213,12 @@ export class Lexer {
     );
   }
 
-	private identifier(): void{
-		while(this.isAlphaNumeric(this.peek()))
-			this.advance();
+  private identifier(): void {
+    while (this.isAlphaNumeric(this.peek())) this.advance();
 
-		let text : string = this.source.substring(this.start , this.current)
-		let type : TokenType = keywords[text];
-		if(type == null)
-			type = TokenType.IDENTIFIER;
-		this.addToken(type , text);
-	}
+    let text: string = this.source.substring(this.start, this.current);
+    let type: TokenType = keywords[text];
+    if (type == null) type = TokenType.IDENTIFIER;
+    this.addToken(type, text);
+  }
 }
