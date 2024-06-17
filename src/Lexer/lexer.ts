@@ -20,55 +20,6 @@ export class Lexer {
     return this.tokens;
   }
 
-  //   Helper functions for scanToken()
-  private advance() {
-    return this.source.charAt(this.current++);
-  }
-
-  private addToken(type: TokenType): void;
-  private addToken(type: TokenType, literal: any): void;
-  private addToken(type: TokenType, literal?: any): void {
-    if (literal === undefined) literal = null;
-    const text = this.source.substring(this.start, this.current);
-    this.tokens.push(new Token(type, text, literal, this.line));
-  }
-
-  private match(expected: string): boolean {
-    if (this.isAtEnd()) return false;
-    if (this.source.charAt(this.current) != expected) return false;
-    this.current++;
-    return true;
-  }
-
-  private peek(): string {
-    if (this.isAtEnd()) return "\0";
-    return this.source.charAt(this.current);
-  }
-
-	private string() : void{
-
-		// Loop untill it finds " or gets at the end of line 
-		while(this.peek() != '"' && !this.isAtEnd()){
-
-			// If lexer is at new line 
-			if(this.peek() == '\n')
-				this.line++;
-			this.advance();
-		}
-
-		// If lexer is not at the end
-		if(this.isAtEnd()){
-			Error.error(this.line, "Unterminated String." );
-			return ;
-		}
-		
-		this.advance();
-
-		// It extracts the value between " " 
-		const value : string = this.source.substring(this.start + 1 , this.current- 1)
-		this.addToken(TokenType.STRING , value);
-	}
-
   private scanToken(): void {
     const c: string = this.advance();
 
@@ -149,12 +100,92 @@ export class Lexer {
 
       // If character is not recognised it will throw this error
       default:
-        Error.error(this.line, "Unexpected character.");
-        break;
+        // Number literals
+        if (this.isDigit(c)) {
+          this.number();
+        } else {
+          Error.error(this.line, "Unexpected character.");
+          break;
+        }
     }
   }
 
+  //   Helper functions for scanToken()
+
   private isAtEnd(): boolean {
     return this.current >= this.source.length;
+  }
+
+  private advance() {
+    return this.source.charAt(this.current++);
+  }
+
+  private addToken(type: TokenType): void;
+  private addToken(type: TokenType, literal: any): void;
+  private addToken(type: TokenType, literal?: any): void {
+    if (literal === undefined) literal = null;
+    const text = this.source.substring(this.start, this.current);
+    this.tokens.push(new Token(type, text, literal, this.line));
+  }
+
+  private match(expected: string): boolean {
+    if (this.isAtEnd()) return false;
+    if (this.source.charAt(this.current) != expected) return false;
+    this.current++;
+    return true;
+  }
+
+  private peek(): string {
+    if (this.isAtEnd()) return "\0";
+    return this.source.charAt(this.current);
+  }
+
+  private peekNext(): string {
+    if (this.current + 1 >= this.source.length) return "\0";
+    return this.source.charAt(this.current + 1);
+  }
+
+  private isDigit(c: string): boolean {
+    return c >= "0" && c <= "9";
+  }
+
+  private string(): void {
+    // Loop untill it finds " or gets at the end of line
+    while (this.peek() != '"' && !this.isAtEnd()) {
+      // If lexer is at new line
+      if (this.peek() == "\n") this.line++;
+      this.advance();
+    }
+
+    // If lexer is not at the end
+    if (this.isAtEnd()) {
+      Error.error(this.line, "Unterminated String.");
+      return;
+    }
+
+    this.advance();
+
+    // It extracts the value between " "
+    const value: string = this.source.substring(
+      this.start + 1,
+      this.current - 1
+    );
+    this.addToken(TokenType.STRING, value);
+  }
+
+  private number(): void {
+    while (this.isDigit(this.peek())) this.advance();
+
+    // Looks for fractional part
+    if (this.peek() == "." && this.isDigit(this.peekNext())) {
+      this.advance();
+
+      while (this.isDigit(this.peek())) this.advance();
+    }
+
+    this.addToken(
+      TokenType.NUMBER,
+      parseFloat(this.source.substring(this.start, this.current))
+    );
   }
 }
