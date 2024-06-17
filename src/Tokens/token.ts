@@ -1,10 +1,10 @@
-import {TokenType} from "./tokenType";
+import {AnyValue, TokenType} from "./tokenType";
 
 export class Token{
     constructor(
         readonly type : TokenType,
         readonly lexeme : string,
-        readonly literal : any ,
+        readonly literal : AnyValue ,
         readonly line : number
     ){}
     

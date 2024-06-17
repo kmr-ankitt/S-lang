@@ -47,3 +47,5 @@ export enum TokenType {
 
   EOF,
 }
+
+export type AnyValue = any;

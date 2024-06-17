@@ -1,6 +1,6 @@
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
-import { TokenType } from "../Tokens/tokenType";
+import { AnyValue, TokenType } from "../Tokens/tokenType";
 import { keywords } from "./mapping";
 
 export class Lexer {
@@ -17,7 +17,7 @@ export class Lexer {
       this.scanToken();
     }
     
-    // this.tokens.push(new Token(TokenType.EOF, "", null, this.line));
+    this.tokens.push(new Token(TokenType.EOF, "", null, this.line));
     return this.tokens;
   }
 
@@ -126,9 +126,9 @@ export class Lexer {
   }
 
   private addToken(type: TokenType): void;
-  private addToken(type: TokenType, literal: any): void;
-  private addToken(type: TokenType, literal?: any): void {
-    if (literal === undefined) literal = null;
+  private addToken(type: TokenType, literal: AnyValue): void;
+  private addToken(type: TokenType, literal?: AnyValue): void {
+    // if (literal === undefined) literal = null;
     const text = this.source.substring(this.start, this.current);
     this.tokens.push(new Token(type, text, literal, this.line));
   }
