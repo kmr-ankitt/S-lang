@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as readline from "readline";
+import { Lexer } from "./Lexer/lexer";
 
 export default class Slang {
   static hadError: boolean = false;
@@ -48,8 +49,8 @@ export default class Slang {
   }
 
   private static run(source: string) {
-    const scanner = new Scanner(source);
-    const tokens = scanner.scanTokens();
+    const lexer = new Lexer(source);
+    const tokens = lexer.scanTokens();
 
     for (let token of tokens) {
       console.log(token);
