@@ -1,6 +1,6 @@
 import Slang from "../main";
 
-class error {
+export class error {
   static error(line: number, message: string) {
     this.report(line, "", message);
   }
