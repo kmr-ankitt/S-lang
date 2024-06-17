@@ -19,7 +19,7 @@ export default class Slang {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
-      prompt: ">>> ",
+      prompt: "> ",
     });
 
     rl.on("line", (line) => {
