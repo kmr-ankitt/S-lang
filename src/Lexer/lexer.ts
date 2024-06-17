@@ -12,12 +12,12 @@ export class Lexer {
   constructor(private readonly source: string) {}
 
   scanTokens(): Token[] {
-    while (!this.isAtEnd) {
+    while (!this.isAtEnd()) {
       this.start = this.current;
       this.scanToken();
     }
-
-    this.tokens.push(new Token(TokenType.EOF, "", null, this.line));
+    
+    // this.tokens.push(new Token(TokenType.EOF, "", null, this.line));
     return this.tokens;
   }
 
@@ -98,7 +98,7 @@ export class Lexer {
       case '"':
         this.string();
         break;
-
+      
       // If character is not recognised it will throw this error
       default:
         // Number literals
@@ -213,6 +213,6 @@ export class Lexer {
 		let type : TokenType = keywords[text];
 		if(type == null)
 			type = TokenType.IDENTIFIER;
-		this.addToken(type);
+		this.addToken(type , text);
 	}
 }

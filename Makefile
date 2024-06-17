@@ -1,13 +1,18 @@
+# Define directories
 TS_DIR = src
 OUT_DIR = dist
+
+# Find all TypeScript files
 TS_FILES = $(wildcard $(TS_DIR)/**/*.ts)
+
+# Define corresponding JavaScript output files
 JS_FILES = $(TS_FILES:$(TS_DIR)/%.ts=$(OUT_DIR)/%.js)
 
 # Default target
 all: build run
 
 # Compile TypeScript to JavaScript
-build: $(JS_FILES)
+build:
 	npx tsc
 
 # Run the project

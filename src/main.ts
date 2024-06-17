@@ -1,51 +1,47 @@
-import * as fs from "fs";
-import * as readline from "readline";
+import fs from "fs";
+import readline from "readline";
 import { Lexer } from "./Lexer/lexer";
 
 export default class Slang {
   static hadError: boolean = false;
 
-//   This the core method 
-  public static main(args: string[]): void {
-    if (args.length > 1) {
-      console.log("Usage: s-lang [script]");
-      process.exit(64);
-    } else if (args.length == 1) {
-      this.runFile(args[0]);
-    } else {
-      this.runPrompt();
+  //   This make the run Slang as file
+  static runFile(path: string) {
+    const buffer = fs.readFileSync(path);
+    this.run(buffer.toString());
+
+    if (this.hadError) {
+      process.exit(65);
     }
   }
 
-//   This make the run Slang as file 
-  private static runFile(path: string): void {
-    fs.readFile(path, (err, data) => {
-      const content = data.toString();
-      this.run(content);
-      this.hadError = false;
-    });
-
-    if(this.hadError)
-        process.exit(65);
-  }
-
-  private static runPrompt(): void {
+  static runPrompt() {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
-      prompt: "> ",
+      prompt: ">>> ",
+    });
+
+    rl.on("line", (line) => {
+      line = line.trim();
+
+      if (line === "exit") {
+        rl.close();
+      } else {
+        if (line) {
+          try {
+            this.run(line);
+          } catch (err) {
+            console.log(err);
+          } finally {
+            this.hadError = false;
+          }
+        }
+        rl.prompt();
+      }
     });
 
     rl.prompt();
-
-    // Readline is used here to reads line input from user
-    rl.on("line", (line) => {
-      this.runFile(line);
-      rl.prompt();
-    }).on("close", () => {
-      console.log("Goodbye!");
-      process.exit(0);
-    });
   }
 
   private static run(source: string) {
@@ -57,3 +53,16 @@ export default class Slang {
     }
   }
 }
+
+function main() {
+  if (process.argv.length > 3) {
+    console.log("Usage: S-lang [script]");
+    process.exit(64);
+  } else if (process.argv.length === 3) {
+    Slang.runFile(process.argv[2]);
+  } else {
+    Slang.runPrompt();
+  }
+}
+
+main();
