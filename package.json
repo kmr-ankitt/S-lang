@@ -1,0 +1,22 @@
+{
+  "name": "s-lang",
+  "version": "1.0.0",
+  "description": "S-lang programming language",
+  "main": "main.ts",
+  "scripts": {
+    "test": "npx tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kmr-ankitt/s-lang.git"
+  },
+  "keywords": [
+    "compiler"
+  ],
+  "author": "Ankit kumar sahu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kmr-ankitt/s-lang/issues"
+  },
+  "homepage": "https://github.com/kmr-ankitt/s-lang#readme"
+}
