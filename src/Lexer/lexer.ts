@@ -1,6 +1,7 @@
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
+import { keywords } from "./mapping";
 
 export class Lexer {
   private start: number = 0;
@@ -103,14 +104,18 @@ export class Lexer {
         // Number literals
         if (this.isDigit(c)) {
           this.number();
-        } else {
+        } 
+				else if(this.isAlpha(c)){
+					this.identifier();
+				}
+				else {
           Error.error(this.line, "Unexpected character.");
           break;
         }
     }
   }
 
-  //   Helper functions for scanToken()
+  /** 	Helper functions for scanToken()	**/
 
   private isAtEnd(): boolean {
     return this.current >= this.source.length;
@@ -148,6 +153,17 @@ export class Lexer {
   private isDigit(c: string): boolean {
     return c >= "0" && c <= "9";
   }
+
+	// Anything starting with letter and underscore is an identifier
+	private isAlpha(c : string) : boolean{
+		return (c >= 'a' && c <= 'z') ||
+		(c >= 'A' && c <= 'Z') ||
+		 c == '_';
+	}
+
+	private isAlphaNumeric(c : string): boolean{
+		return this.isAlpha(c) || this.isDigit(c);
+	}
 
   private string(): void {
     // Loop untill it finds " or gets at the end of line
@@ -188,4 +204,15 @@ export class Lexer {
       parseFloat(this.source.substring(this.start, this.current))
     );
   }
+
+	private identifier(): void{
+		while(this.isAlphaNumeric(this.peek()))
+			this.advance();
+
+		let text : string = this.source.substring(this.start , this.current)
+		let type : TokenType = keywords[text];
+		if(type == null)
+			type = TokenType.IDENTIFIER;
+		this.addToken(type);
+	}
 }
