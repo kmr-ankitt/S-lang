@@ -59,20 +59,34 @@ export class Lexer {
 
       // "/" needs special handling cus comments also have / in it
       case "/":
-        // This is Comment logic: If current is not at new line and current is not at the end then current will skip that part of code
+        // Single-line comment: If current is not at a new line and current is not at the end, then current will skip that part of code
         if (this.match("/")) {
           while (this.peek() != "\n" && !this.isAtEnd()) this.advance();
-          
+
           // Multi-line comment
         } else if (this.match("*")) {
-          this.advance(); // Advance past the '*' after '/'
+          let toMatch = 1;
           while (!this.isAtEnd()) {
             if (this.peek() == "*" && this.peekNext() == "/") {
-              this.advance(); // Advance past the '*'
-              this.advance(); // Advance past the '/'
-              break; // Exit the comment block
+              toMatch--;
+              this.advance(); // Move past '*'
+              this.advance(); // Move past '/'
+            } else if (this.peek() == "/" && this.peekNext() == "*") {
+              toMatch++;
+              this.advance(); // Move past '/'
+              this.advance(); // Move past '*'
+            } else if (this.peek() == "\n") {
+              this.line++;
+              this.advance();
+            } else {
+              this.advance();
             }
-            this.advance();
+
+            if (toMatch == 0) break;
+          }
+
+          if (toMatch > 0) {
+            Error.error(this.line, "No closing of block comment.");
           }
         } else {
           this.addToken(TokenType.SLASH);
