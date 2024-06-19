@@ -5,7 +5,7 @@ import { Lexer } from "./Lexer/lexer";
 export default class Slang {
   static hadError: boolean = false;
 
-  //   This make the run Slang as file
+  //   This make Slang run as .sl file
   static runFile(path: string) {
     const buffer = fs.readFileSync(path);
     this.run(buffer.toString());
