@@ -19,32 +19,32 @@ function defineType(content: string, baseName: string, className: string, fieldL
   }
 
   content += "    }\n\n";
-  content += "}\n\n";
+  // content += "}\n\n";
 
-  // content += "    public accept<T>(visitor: Visitor<T>): T {\n";
-  // content += `        return visitor.visit${className}${baseName}(this);\n`;
-  // content += "    }\n}\n\n";
+  content += "    public accept<R>(visitor: Visitor<R>): R {\n";
+  content += `        return visitor.visit${className}${baseName}(this);\n`;
+  content += "    }\n}\n\n";
 
   return content;
 }
 
-// function defineVisitor(content: string, baseName: string, types: string[]): string {
-//   content += "export interface Visitor<T> {\n";
+function defineVisitor(content: string, baseName: string, types: string[]): string {
+  content += "export interface Visitor<R> {\n";
 
-//   for (const type of types) {
-//     const typeName = type.split(":")[0].trim();
-//     content += `    visit${typeName}${baseName}(${baseName.toLowerCase()}: ${typeName}): T;\n`;
-//   }
+  for (const type of types) {
+    const typeName = type.split(":")[0].trim();
+    content += `    visit${typeName}${baseName}(${baseName.toLowerCase()}: ${typeName}): R;\n`;
+  }
 
-//   content += "}\n\n";
-//   return content;
-// }
+  content += "}\n\n";
+  return content;
+}
 
 function defineAst(outDir: string, baseName: string, types: string[], imports: string): void {
   const path = `${outDir}/${baseName}.ts`;
   let content = imports.endsWith(";") ? `${imports}\n\n` : `${imports};\n\n`;
   
-  // content = defineVisitor(content, baseName, types);
+  content = defineVisitor(content, baseName, types);
   
   const classNames = types.map(v => v.split(" : ")[0].trim());
   content += `export type ${baseName} = ${classNames.join(" | ")};\n\n`;
@@ -80,7 +80,7 @@ function defineAst(outDir: string, baseName: string, types: string[], imports: s
     // "Super    : keyword: Token, method: Token",
     // "This     : keyword: Token",
     // "Variable : name: Token",
-  ], 'import { Token } from "./Tokens/token"; \nimport { AnyValue } from "./Tokens/tokenType"; ' );
+  ], 'import { Token } from "../Tokens/token"; \nimport { AnyValue } from "../Tokens/tokenType"; ' );
 
 
   // defineAst(

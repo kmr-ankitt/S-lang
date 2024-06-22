@@ -1,5 +1,12 @@
-import { Token } from "./Tokens/token"; 
-import { AnyValue } from "./Tokens/tokenType"; ;
+import { Token } from "../Tokens/token"; 
+import { AnyValue } from "../Tokens/tokenType"; ;
+
+export interface Visitor<R> {
+    visitBinaryExpr(expr: Binary): R;
+    visitGroupingExpr(expr: Grouping): R;
+    visitLiteralExpr(expr: Literal): R;
+    visitUnaryExpr(expr: Unary): R;
+}
 
 export type Expr = Binary | Grouping | Literal | Unary;
 
@@ -14,6 +21,9 @@ export class Binary {
         this.right = right;
     }
 
+    public accept<R>(visitor: Visitor<R>): R {
+        return visitor.visitBinaryExpr(this);
+    }
 }
 
 export class Grouping {
@@ -23,6 +33,9 @@ export class Grouping {
         this.expression = expression;
     }
 
+    public accept<R>(visitor: Visitor<R>): R {
+        return visitor.visitGroupingExpr(this);
+    }
 }
 
 export class Literal {
@@ -32,6 +45,9 @@ export class Literal {
         this.value = value;
     }
 
+    public accept<R>(visitor: Visitor<R>): R {
+        return visitor.visitLiteralExpr(this);
+    }
 }
 
 export class Unary {
@@ -43,5 +59,8 @@ export class Unary {
         this.right = right;
     }
 
+    public accept<R>(visitor: Visitor<R>): R {
+        return visitor.visitUnaryExpr(this);
+    }
 }
 
