@@ -19,6 +19,9 @@ build:
 run: build
 	node $(OUT_DIR)/main.js
 
+ast: build
+	node $(OUT_DIR)/Tools/AstGenerator.js src/Ast
+
 # Watch files and rebuild on changes
 watch:
 	npx tsc --watch
