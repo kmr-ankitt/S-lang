@@ -1,17 +1,23 @@
 import { Binary, Expr, Grouping, Literal, Unary } from "../Ast/Expr";
 import { Error } from "../Error/error";
-import Slang from "../main";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
 import { ParseError } from "./parseError";
 
 export class Parser {
-  
   private readonly tokens: Token[];
   private current: number = 0;
 
   constructor(tokens: Token[]) {
     this.tokens = tokens;
+  }
+
+  parse(): Expr {
+    try {
+      return this.expression();
+    } catch (error) {
+      return new Literal(null);
+    }
   }
 
   private expression(): Expr {
@@ -88,7 +94,7 @@ export class Parser {
 
   //   primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
 
-  private primary() : Expr {
+  private primary(): Expr {
     if (this.match(TokenType.FALSE)) return new Literal(false);
     if (this.match(TokenType.TRUE)) return new Literal(true);
     if (this.match(TokenType.NIL)) return new Literal(null);
@@ -156,7 +162,7 @@ export class Parser {
   }
 
   // Consume the next token if it matches the expected type.
-  private consume(type : TokenType, message : string) : void {
+  private consume(type: TokenType, message: string): void {
     if (this.check(type)) {
       this.advance();
     } else {
@@ -164,8 +170,32 @@ export class Parser {
     }
   }
 
-  private error(token : Token, message : string) : ParseError {
+  private error(token: Token, message: string): ParseError {
     Error.error(token, message);
     return new ParseError();
+  }
+
+  // Synchronize the parser to the end of the file. It discards tokens until it thinks it has found a statement boundary.
+
+  private synchronize(): void {
+    this.advance();
+
+    while (!this.isAtEnd()) {
+      if (this.previous().type === TokenType.SEMICOLON) return;
+
+      switch (this.peek().type) {
+        case TokenType.CLASS:
+        case TokenType.FUN:
+        case TokenType.VAR:
+        case TokenType.FOR:
+        case TokenType.IF:
+        case TokenType.WHILE:
+        case TokenType.PRINT:
+        case TokenType.RETURN:
+          return;
+      }
+
+      this.advance();
+    }
   }
 }
