@@ -1,6 +1,8 @@
 import fs from "fs";
 import readline from "readline";
 import { Lexer } from "./Lexer/lexer";
+import { AstPrinter } from "./Printer/AstPrinter";
+import { Parser } from "./Parser/parser";
 
 export default class Slang {
   static hadError: boolean = false;
@@ -47,10 +49,13 @@ export default class Slang {
   private static run(source: string) {
     const lexer = new Lexer(source);
     const tokens = lexer.scanTokens();
+    const parser = new Parser(tokens);
+    const expression = parser.parse();
 
-    for (let token of tokens) {
-      console.log(token);
-    }
+
+    if(this.hadError) 
+      return;
+    console.log(new AstPrinter().print(expression))
   }
 }
 
