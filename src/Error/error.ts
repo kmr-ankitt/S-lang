@@ -10,12 +10,17 @@ export class Error {
     Slang.hadError = true;
   }
 
-  static error(token : Token, message : string) : void { 
-    if(token.type === TokenType.EOF)
-      this.report(token.line, " at end", message);
-
-    else
-      this.report(token.line, " at '" + token.lexeme + "'", message);
-
+  static error(line: number, message: string): void;
+  static error(token: Token, message: string): void;
+  static error(arg1: number | Token, message: string): void {
+    if (typeof arg1 === "number") {
+      this.report(arg1, "", message);
+    } else {
+      if (arg1.type === TokenType.EOF) {
+        this.report(arg1.line, " at end", message);
+      } else {
+        this.report(arg1.line, " at '" + arg1.lexeme + "'", message);
+      }
+    }
   }
 }
