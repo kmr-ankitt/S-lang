@@ -3,9 +3,13 @@ import readline from "readline";
 import { Lexer } from "./Lexer/lexer";
 import { AstPrinter } from "./Printer/AstPrinter";
 import { Parser } from "./Parser/parser";
+import { Interpreter } from "./Interpreter/interpreter";
 
 export default class Slang {
+
+  private static readonly interpreter : Interpreter = new Interpreter();
   static hadError: boolean = false;
+  static hadRuntimeError: boolean = false;
 
   //   This make the run Slang as file
   static runFile(path: string) {
@@ -14,6 +18,9 @@ export default class Slang {
 
     if (this.hadError) {
       process.exit(65);
+    }
+    if (this.hadRuntimeError) {
+      process.exit(70);
     }
   }
 
@@ -55,7 +62,8 @@ export default class Slang {
 
     if(this.hadError) 
       return;
-    console.log(new AstPrinter().print(expression))
+    
+    this.interpreter.interpret(expression);
   }
 }
 
