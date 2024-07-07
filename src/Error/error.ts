@@ -1,6 +1,7 @@
 import Slang from "../main";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
+import { RuntimeError } from "./RuntimeError";
 
 export class Error {
 
@@ -8,6 +9,11 @@ export class Error {
   private static report(line: number, where: string, message: string) {
     console.error("[line " + line + "] Error" + where + ": " + message);
     Slang.hadError = true;
+  }
+
+  static runtimeError(error : RuntimeError) : void{
+    console.error(error.message + "\n[line " + error.token.line + "]");
+    Slang.hadRuntimeError = true;
   }
 
   static error(line: number, message: string): void;

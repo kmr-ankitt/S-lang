@@ -1,7 +1,6 @@
 import fs from "fs";
 import readline from "readline";
 import { Lexer } from "./Lexer/lexer";
-import { AstPrinter } from "./Printer/AstPrinter";
 import { Parser } from "./Parser/parser";
 import { Interpreter } from "./Interpreter/interpreter";
 
