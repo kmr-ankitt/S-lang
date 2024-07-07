@@ -1,5 +1,6 @@
 import { Binary, Expr, Grouping, Literal, Unary, Visitor } from "../Ast/Expr";
 import { Error } from "../Error/error";
+import { RuntimeError } from "../Error/RuntimeError";
 import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
 
@@ -41,7 +42,7 @@ export class Interpreter implements Visitor<AnyValue> {
           if(typeof left === "string" && typeof right === "string"){
             return left + right;
           }
-          break;
+          throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
 
         case TokenType.MINUS:
           this.checkNumberOperands(expr.operator, left, right); 
@@ -103,18 +104,18 @@ export class Interpreter implements Visitor<AnyValue> {
     return a.equals(b);
   }
 
-  checkNumberOperand(operator: Token, value: AnyValue) {
-    if (typeof value === "number") {  
+  private checkNumberOperand(operator: Token, operand: AnyValue): void {
+    if (typeof operand === "number") {  
       return;
     }
-    throw Error.error(operator.line, "Operands must be a number");
+    throw new RuntimeError(operator, "Operands must be a number.");
 
   }
 
-  checkNumberOperands(operator: Token, left: AnyValue, right: AnyValue) {
+  private checkNumberOperands(operator: Token, left: AnyValue, right: AnyValue): void {
     if (typeof left === "number" && typeof right === "number") {
       return;
     }
-    throw Error.error(operator.line, "Operands must be numbers");
+    throw new RuntimeError(operator, "Operands must be numbers.");
   }
 }
