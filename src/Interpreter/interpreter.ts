@@ -1,16 +1,16 @@
 import { Binary, Expr, Grouping, Literal, Unary, Visitor } from "../Ast/Expr";
+import { Error } from "../Error/error";
 import { RuntimeError } from "../Error/RuntimeError";
 import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
-import Slang from "../main";
 
 export class Interpreter implements Visitor<AnyValue> {
   interpret(expression: Expr): void {
     try {
       const value: AnyValue = this.evaluate(expression);
       console.log(this.stringify(value));
-    } catch (error) {
-      // Slang.runtimeError(error); // TODO: Implement runtime error
+    } catch (error : any) {
+      Error.runtimeError(error);
     }
   }
 
@@ -60,6 +60,8 @@ export class Interpreter implements Visitor<AnyValue> {
 
       case TokenType.SLASH:
         this.checkNumberOperands(expr.operator, left, right);
+        if(right == 0)
+          throw new RuntimeError(expr.operator, "Cannot divide by zero.");
         return left / right;
 
       case TokenType.STAR:
