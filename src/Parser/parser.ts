@@ -1,4 +1,5 @@
 import { Binary, Expr, Grouping, Literal, Unary } from "../Ast/Expr";
+import { Expression, Print, Stmt } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
@@ -12,16 +13,44 @@ export class Parser {
     this.tokens = tokens;
   }
 
+/*** Was done to check if the parser is working
   parse(): Expr {
     try {
       return this.expression();
     } catch (error) {
       return new Literal(null);
     }
+  } 
+***/
+
+  parse() : Stmt[]{
+    let statements : Stmt[] = [];
+    while(!this.isAtEnd())
+      statements.push(this.statement());
+    return statements;
   }
 
   private expression(): Expr {
     return this.equality();
+  }
+
+  private statement(): Stmt{
+    if(this.match(TokenType.PRINT))
+      return this.printStatement();
+
+    return this.expressionStatement();
+  }
+
+  private printStatement(): Stmt{
+    const value : Expr = this.expression();
+    this.consume(TokenType.SEMICOLON, "Expect ';' after value.");
+    return new Print(value);
+  }
+
+  private expressionStatement(): Stmt{
+    const expr : Expr = this.expression();
+    this.consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+    return new Expression(expr);
   }
 
   private equality(): Expr {
