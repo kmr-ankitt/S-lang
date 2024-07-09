@@ -56,13 +56,13 @@ export default class Slang {
     const lexer = new Lexer(source);
     const tokens = lexer.scanTokens();
     const parser = new Parser(tokens);
-    const expression = parser.parse();
+    const statements = parser.parse()
 
 
     if(this.hadError) 
       return;
     
-    this.interpreter.interpret(expression);
+    this.interpreter.interpret(statements);
   }
 }
 

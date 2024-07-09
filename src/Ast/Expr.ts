@@ -1,7 +1,7 @@
 import { Token } from "../Tokens/token"; 
 import { AnyValue } from "../Tokens/tokenType"; ;
 
-export interface Visitor<R> {
+export interface ExprVisitor<R> {
     visitBinaryExpr(expr: Binary): R;
     visitGroupingExpr(expr: Grouping): R;
     visitLiteralExpr(expr: Literal): R;
@@ -21,7 +21,7 @@ export class Binary {
         this.right = right;
     }
 
-    public accept<R>(visitor: Visitor<R>): R {
+    public accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitBinaryExpr(this);
     }
 }
@@ -33,7 +33,7 @@ export class Grouping {
         this.expression = expression;
     }
 
-    public accept<R>(visitor: Visitor<R>): R {
+    public accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitGroupingExpr(this);
     }
 }
@@ -45,7 +45,7 @@ export class Literal {
         this.value = value;
     }
 
-    public accept<R>(visitor: Visitor<R>): R {
+    public accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitLiteralExpr(this);
     }
 }
@@ -59,7 +59,7 @@ export class Unary {
         this.right = right;
     }
 
-    public accept<R>(visitor: Visitor<R>): R {
+    public accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitUnaryExpr(this);
     }
 }

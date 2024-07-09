@@ -26,7 +26,7 @@ function defineType(
   content += "    }\n\n";
   // content += "}\n\n";
 
-  content += "    public accept<R>(visitor: Visitor<R>): R {\n";
+  content += `    public accept<R>(visitor: ${baseName}Visitor<R>): R {\n`;
   content += `        return visitor.visit${className}${baseName}(this);\n`;
   content += "    }\n}\n\n";
 
@@ -38,7 +38,7 @@ function defineVisitor(
   baseName: string,
   types: string[]
 ): string {
-  content += "export interface Visitor<R> {\n";
+  content += `export interface ${baseName}Visitor<R> {\n`;
 
   for (const type of types) {
     const typeName = type.split(":")[0].trim();

@@ -1,8 +1,8 @@
-import { Visitor, Binary, Expr, Grouping, Literal, Unary } from "../Ast/Expr";
+import { ExprVisitor, Expr, Binary, Grouping, Literal, Unary } from "../Ast/Expr";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
 
-export class AstPrinter implements Visitor<string> {
+export class AstPrinter implements ExprVisitor<string> {
   print(expr: Expr) {
     return expr.accept(this);
   }

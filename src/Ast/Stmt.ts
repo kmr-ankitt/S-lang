@@ -1,6 +1,6 @@
 import { Expr } from "./Expr";
 
-export interface Visitor<R> {
+export interface StmtVisitor<R> {
     visitExpressionStmt(stmt: Expression): R;
     visitPrintStmt(stmt: Print): R;
 }
@@ -14,7 +14,7 @@ export class Expression {
         this.expression = expression;
     }
 
-    public accept<R>(visitor: Visitor<R>): R {
+    public accept<R>(visitor: StmtVisitor<R>): R {
         return visitor.visitExpressionStmt(this);
     }
 }
@@ -26,7 +26,7 @@ export class Print {
         this.expression = expression;
     }
 
-    public accept<R>(visitor: Visitor<R>): R {
+    public accept<R>(visitor: StmtVisitor<R>): R {
         return visitor.visitPrintStmt(this);
     }
 }

@@ -1,17 +1,29 @@
-import { Binary, Expr, Grouping, Literal, Unary, Visitor } from "../Ast/Expr";
+import { Binary, Expr, Grouping, Literal, Unary, ExprVisitor } from "../Ast/Expr";
+import { Expression, Print, Stmt, StmtVisitor } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { RuntimeError } from "../Error/RuntimeError";
 import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
 
-export class Interpreter implements Visitor<AnyValue> {
-  interpret(expression: Expr): void {
+export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
+
+  interpret(statements : Stmt[]) : void {
     try {
-      const value: AnyValue = this.evaluate(expression);
-      console.log(this.stringify(value));
+      for(const statement of statements) {
+        this.execute(statement); 
+      }
     } catch (error : any) {
       Error.runtimeError(error);
     }
+  }
+
+  public visitExpressionStmt(stmt: Expression): void {
+      this.evaluate(stmt.expression);
+  }
+
+  public visitPrintStmt(stmt: Print): void {
+    const value : AnyValue = this.evaluate(stmt.expression);
+    console.log(this.stringify(value))
   }
 
   public visitLiteralExpr(expr: Literal): AnyValue {
@@ -123,6 +135,10 @@ export class Interpreter implements Visitor<AnyValue> {
       return text;
     }
     return object.toString();
+  }
+
+  private execute(stmt : Stmt): void{
+    stmt.accept(this);
   }
 
   private checkNumberOperand(operator: Token, operand: AnyValue): void {
