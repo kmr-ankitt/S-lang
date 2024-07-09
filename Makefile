@@ -20,7 +20,7 @@ run: build
 	node $(OUT_DIR)/main.js
 
 slang: build
-	node $(OUT_DIR)/main.js lmao.lox
+	node $(OUT_DIR)/main.js test.lox
 
 ast: build
 	node $(OUT_DIR)/Tools/AstGenerator.js src/Ast
