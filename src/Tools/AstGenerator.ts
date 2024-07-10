@@ -96,7 +96,7 @@ function defineAst(
       // "Setter   : obj: Expr, name: Token, val: Expr", // Named Setter instead of Set cause of collision with the JS Set
       // "Super    : keyword: Token, method: Token",
       // "This     : keyword: Token",
-      // "Variable : name: Token",
+      "Variable : name: Token",
     ],
     'import { Token } from "../Tokens/token"; \nimport { AnyValue } from "../Tokens/tokenType"; '
   );
@@ -112,10 +112,10 @@ function defineAst(
       //     "Func       : name: Token, params: Token[], body: Stmt[]",
       //     "If         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
       //     "Return     : keyword: Token, value: Expr | null",
-      //     // initializer is Expr | null to stop typescript from complaining.
-      //     "Var        : name: Token, initializer: Expr | null",
+          // initializer is Expr | null to stop typescript from complaining.
+          "Var        : name: Token, initializer: Expr",
       //     "While      : condition: Expr, body: Stmt",
     ],
-    'import { Expr } from "./Expr";'
+    'import { Expr } from "./Expr";\nimport { Token } from "../Tokens/token";'
   );
 })();
