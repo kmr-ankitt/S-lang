@@ -219,7 +219,7 @@ export class Parser {
 
   // Consume the next token if it matches the expected type.
   private consume(type: TokenType, message: string): Token {
-    if (this.check(type)) this.advance();
+    if (this.check(type)) return this.advance();
     throw this.error(this.peek(), message);
   }
 
