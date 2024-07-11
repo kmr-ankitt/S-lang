@@ -1,11 +1,14 @@
-import { Binary, Expr, Grouping, Literal, Unary, ExprVisitor } from "../Ast/Expr";
-import { Expression, Print, Stmt, StmtVisitor } from "../Ast/Stmt";
+import { Binary, Expr, Grouping, Literal, Unary, ExprVisitor, Variable } from "../Ast/Expr";
+import { Expression, Print, Stmt, StmtVisitor, Var } from "../Ast/Stmt";
+import { Environment } from "../Environment/environment";
 import { Error } from "../Error/error";
 import { RuntimeError } from "../Error/RuntimeError";
 import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
 
 export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
+
+  private environment : Environment = new Environment();
 
   interpret(statements : Stmt[]) : void {
     try {
@@ -26,6 +29,16 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     console.log(this.stringify(value))
   }
 
+  public visitVarStmt(stmt: Var): void {
+    let value : AnyValue = null;
+    if(stmt.initializer != null)
+      value = this.evaluate(stmt.initializer);
+
+    this.environment.define(stmt.name.lexeme, value);
+  }
+
+  /*  Expression  Resolvers  */
+
   public visitLiteralExpr(expr: Literal): AnyValue {
     return expr.value;
   }
@@ -45,6 +58,10 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
         return !this.isTruthy(right);
     }
     return null;
+  }
+
+  public visitVariableExpr(expr: Variable): AnyValue {
+      return this.environment.get(expr.name);
   }
 
   public visitBinaryExpr(expr: Binary): AnyValue {
