@@ -6,10 +6,11 @@ export interface ExprVisitor<R> {
     visitGroupingExpr(expr: Grouping): R;
     visitLiteralExpr(expr: Literal): R;
     visitUnaryExpr(expr: Unary): R;
+    visitAssignExpr(expr: Assign): R;
     visitVariableExpr(expr: Variable): R;
 }
 
-export type Expr = Binary | Grouping | Literal | Unary | Variable;
+export type Expr = Binary | Grouping | Literal | Unary | Assign | Variable;
 
 export class Binary {
     public left: Expr;
@@ -62,6 +63,20 @@ export class Unary {
 
     public accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitUnaryExpr(this);
+    }
+}
+
+export class Assign {
+    public name: Token;
+    public value: Expr;
+
+    public constructor(name: Token, value: Expr) {
+        this.name = name;
+        this.value = value;
+    }
+
+    public accept<R>(visitor: ExprVisitor<R>): R {
+        return visitor.visitAssignExpr(this);
     }
 }
 

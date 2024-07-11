@@ -89,7 +89,7 @@ function defineAst(
       "Grouping : expression: Expr",
       "Literal  : value: AnyValue ",
       "Unary    : operator: Token, right: Expr",
-      // "Assign   : name: Token, value: Expr",
+      "Assign   : name: Token, value: Expr",
       // "Call     : callee: Expr, paren: Token, args: Expr[]",
       // "Getter   : obj: Expr, name: Token", // Named Getter instead of Get for consistency with Setter
       // "Logical  : left: Expr, operator: Token, right: Expr",

@@ -1,4 +1,4 @@
-import { Binary, Expr, Grouping, Literal, Unary, Variable } from "../Ast/Expr";
+import { Assign, Binary, Expr, Grouping, Literal, Unary, Variable } from "../Ast/Expr";
 import { Expression, Print, Stmt, Var } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
@@ -30,7 +30,7 @@ export class Parser {
   }
 
   private expression(): Expr {
-    return this.equality();
+    return this.assignment();
   }
 
   private statement(): Stmt {
@@ -77,6 +77,21 @@ export class Parser {
       );
       return new Var(name, initializer);
     }
+  }
+  
+  private assignment() : Expr{
+    const expr: Expr = this.equality();
+    if(this.match(TokenType.EQUAL)){
+      const equals: Token = this.previous();
+      const value : Expr = this.assignment();
+      
+      if(typeof expr === "string"){
+        const name : Token = (expr as any).name;
+        return new Assign(name , value);
+      }
+      this.error(equals, "Invalid assignment target.");
+    }
+    return expr;
   }
 
   private equality(): Expr {
