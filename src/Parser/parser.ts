@@ -85,7 +85,7 @@ export class Parser {
       const equals: Token = this.previous();
       const value : Expr = this.assignment();
       
-      if(typeof expr === "string"){
+      if(expr instanceof Variable){
         const name : Token = (expr as any).name;
         return new Assign(name , value);
       }

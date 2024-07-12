@@ -1,4 +1,4 @@
-import { Binary, Expr, Grouping, Literal, Unary, ExprVisitor, Variable } from "../Ast/Expr";
+import { Binary, Expr, Grouping, Literal, Unary, ExprVisitor, Variable, Assign } from "../Ast/Expr";
 import { Expression, Print, Stmt, StmtVisitor, Var } from "../Ast/Stmt";
 import { Environment } from "../Environment/environment";
 import { Error } from "../Error/error";
@@ -37,6 +37,11 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     this.environment.define(stmt.name.lexeme, value);
   }
 
+  public visitAssignExpr(expr: Assign): AnyValue {
+    const value: AnyValue = this.evaluate(expr.value);
+    this.environment.assign(expr.name, value);
+    return value;
+  }
   /*  Expression  Resolvers  */
 
   public visitLiteralExpr(expr: Literal): AnyValue {
