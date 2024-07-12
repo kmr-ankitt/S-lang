@@ -3,26 +3,38 @@ import { Token } from "../Tokens/token";
 import { AnyValue } from "../Tokens/tokenType";
 
 export class Environment {
-    private readonly values = new Map<string, AnyValue>();
+  private readonly values = new Map<string, AnyValue>();
+  enclosing?: Environment;
 
-    get(name : Token) : AnyValue{
-        if(this.values.has(name.lexeme)){
-            return this.values.get(name.lexeme)!;
-        }
+  constructor(enclosing?: Environment) {
+    this.enclosing = enclosing;
+  }
 
-        throw new RuntimeError(name, `Undefined variable ${name.lexeme}.`);
-    }
-
-    define(name : string, value : AnyValue) : void{
-        this.values.set(name, value);
+  get(name: Token): AnyValue {
+    if (this.values.has(name.lexeme)) {
+      return this.values.get(name.lexeme)!;
     }
     
-    assign(name : Token, value : AnyValue): void{
-      if(this.values.has(name.lexeme)){
-        this.values.set(name.lexeme, value)
-        return;
-      }
-      
-      throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+    if (this.enclosing != null)
+      return this.enclosing.get(name);
+    
+    throw new RuntimeError(name, `Undefined variable ${name.lexeme}.`);
+  }
+
+  define(name: string, value: AnyValue): void {
+    this.values.set(name, value);
+  }
+
+  assign(name: Token, value: AnyValue): void {
+    if (this.values.has(name.lexeme)) {
+      this.values.set(name.lexeme, value);
+      return;
     }
+    if(this.enclosing != null){
+      this.enclosing.assign(name, value);
+      return;
+    }
+
+    throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+  }
 }
