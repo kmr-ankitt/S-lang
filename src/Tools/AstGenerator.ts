@@ -105,7 +105,7 @@ function defineAst(
     outDir,
     "Stmt",
     [
-      //     "Block      : statements: Stmt[]",
+      "Block      : statements: Stmt[]",
       //     "Class      : name: Token, superclass: Variable | null, methods: Func[]",
       "Expression : expression: Expr",
       "Print      : expression: Expr",

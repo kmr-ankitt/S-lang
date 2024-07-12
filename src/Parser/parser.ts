@@ -1,5 +1,5 @@
 import { Assign, Binary, Expr, Grouping, Literal, Unary, Variable } from "../Ast/Expr";
-import { Expression, Print, Stmt, Var } from "../Ast/Stmt";
+import { Block, Expression, Print, Stmt, Var } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
@@ -35,6 +35,7 @@ export class Parser {
 
   private statement(): Stmt {
     if (this.match(TokenType.PRINT)) return this.printStatement();
+    if (this.match(TokenType.LEFT_BRACE)) return new Block(this.block());
 
     return this.expressionStatement();
   }
@@ -59,6 +60,17 @@ export class Parser {
     const expr: Expr = this.expression();
     this.consume(TokenType.SEMICOLON, "Expect ';' after expression.");
     return new Expression(expr);
+  }
+  
+  private block() : Stmt[]{
+    const statements: Stmt[] = [];
+    
+    while(!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd())
+    {
+      statements.push(this.declaration());
+    }
+    this.consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+    return statements;
   }
 
   private varDeclaration(): Stmt {

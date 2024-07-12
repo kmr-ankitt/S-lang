@@ -1,5 +1,5 @@
 import { Binary, Expr, Grouping, Literal, Unary, ExprVisitor, Variable, Assign } from "../Ast/Expr";
-import { Expression, Print, Stmt, StmtVisitor, Var } from "../Ast/Stmt";
+import { Block, Expression, Print, Stmt, StmtVisitor, Var } from "../Ast/Stmt";
 import { Environment } from "../Environment/environment";
 import { Error } from "../Error/error";
 import { RuntimeError } from "../Error/RuntimeError";
@@ -36,13 +36,18 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
     this.environment.define(stmt.name.lexeme, value);
   }
+  
+  public visitBlockStmt(stmt: Block): void {
+    this.executeBlock(stmt.statements, new Environment(this.environment));
+  }
+  
+  /*  Expression  Resolvers  */
 
   public visitAssignExpr(expr: Assign): AnyValue {
     const value: AnyValue = this.evaluate(expr.value);
     this.environment.assign(expr.name, value);
     return value;
   }
-  /*  Expression  Resolvers  */
 
   public visitLiteralExpr(expr: Literal): AnyValue {
     return expr.value;
@@ -163,6 +168,19 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     stmt.accept(this);
   }
 
+  private executeBlock(statements : Stmt[], environment : Environment){
+    const previous: Environment = this.environment;
+    try{
+      this.environment = environment;
+      
+      statements.map((statement)=>{
+        this.execute(statement);
+      })
+    }
+    finally{
+      this.environment = previous;
+    }
+  }
   private checkNumberOperand(operator: Token, operand: AnyValue): void {
     if (typeof operand === "number") {
       return;
