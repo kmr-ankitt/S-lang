@@ -1,5 +1,6 @@
+import { exitCode } from "process";
 import { Binary, Expr, Grouping, Literal, Unary, ExprVisitor, Variable, Assign, Logical } from "../Ast/Expr";
-import { Block, Expression, If, Print, Stmt, StmtVisitor, Var } from "../Ast/Stmt";
+import { Block, Expression, If, Print, Stmt, StmtVisitor, Var, While } from "../Ast/Stmt";
 import { Environment } from "../Environment/environment";
 import { Error } from "../Error/error";
 import { RuntimeError } from "../Error/RuntimeError";
@@ -47,6 +48,11 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
       this.execute(stmt.thenBranch);
     else if (stmt.elseBranch != null)
       this.execute(stmt.elseBranch);
+  }
+  
+  public visitWhileStmt(stmt : While): void {
+    while (this.isTruthy(this.evaluate(stmt.condition)))
+      this.execute(stmt.body);
   }
   
   /*  Expression  Resolvers  */

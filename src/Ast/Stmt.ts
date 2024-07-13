@@ -7,9 +7,10 @@ export interface StmtVisitor<R> {
     visitPrintStmt(stmt: Print): R;
     visitIfStmt(stmt: If): R;
     visitVarStmt(stmt: Var): R;
+    visitWhileStmt(stmt: While): R;
 }
 
-export type Stmt = Block | Expression | Print | If | Var;
+export type Stmt = Block | Expression | Print | If | Var | While;
 
 export class Block {
     public statements: Stmt[];
@@ -74,6 +75,20 @@ export class Var {
 
     public accept<R>(visitor: StmtVisitor<R>): R {
         return visitor.visitVarStmt(this);
+    }
+}
+
+export class While {
+    public condition: Expr;
+    public body: Stmt;
+
+    public constructor(condition: Expr, body: Stmt) {
+        this.condition = condition;
+        this.body = body;
+    }
+
+    public accept<R>(visitor: StmtVisitor<R>): R {
+        return visitor.visitWhileStmt(this);
     }
 }
 

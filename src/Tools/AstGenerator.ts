@@ -113,8 +113,8 @@ function defineAst(
       "If         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
       //     "Return     : keyword: Token, value: Expr | null",
           // initializer is Expr | null to stop typescript from complaining.
-          "Var        : name: Token, initializer: Expr",
-      //     "While      : condition: Expr, body: Stmt",
+      "Var        : name: Token, initializer: Expr",
+      "While      : condition: Expr, body: Stmt",
     ],
     'import { Expr } from "./Expr";\nimport { Token } from "../Tokens/token";'
   );

@@ -1,6 +1,6 @@
 import { isJSDocClassTag } from "typescript";
 import { Assign, Binary, Expr, Grouping, Literal, Logical, Unary, Variable } from "../Ast/Expr";
-import { Block, Expression, If, Print, Stmt, Var } from "../Ast/Stmt";
+import { Block, Expression, If, Print, Stmt, Var, While } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
@@ -39,6 +39,7 @@ export class Parser {
     if (this.match(TokenType.PRINT)) return this.printStatement();
     if (this.match(TokenType.LEFT_BRACE)) return new Block(this.block());
     if (this.match(TokenType.IF)) return this.ifStatement();
+    if (this.match(TokenType.WHILE)) return this.whileStatement();
     
     return this.expressionStatement();
   }
@@ -115,6 +116,15 @@ export class Parser {
     }
     
     return expr;
+  }
+  
+  private whileStatement() : Stmt{
+    this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+    const condition: Expr = this.expression();
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
+    const body: Stmt = this.statement();
+    
+    return new While(condition, body);
   }
   
   private varDeclaration(): Stmt {
