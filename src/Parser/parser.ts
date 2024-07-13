@@ -1,9 +1,11 @@
-import { Assign, Binary, Expr, Grouping, Literal, Unary, Variable } from "../Ast/Expr";
+import { isJSDocClassTag } from "typescript";
+import { Assign, Binary, Expr, Grouping, Literal, Logical, Unary, Variable } from "../Ast/Expr";
 import { Block, Expression, If, Print, Stmt, Var } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
 import { ParseError } from "./parseError";
+import { log } from "console";
 
 export class Parser {
   private readonly tokens: Token[];
@@ -87,6 +89,34 @@ export class Parser {
     return new If(condition, thenBranch, elseBranch);
   }
   
+  /** Since Lox is dynamically typed, we allow operands of any type and use truthiness to determine what each operand represents.
+  We apply similar reasoning to the result. Instead of promising to literally return true or false, a logic operator merely 
+  guarantees it will return a value with appropriate truthiness. ***/
+  
+  private or() : Expr {
+    let expr: Expr = this.and();
+    
+    while(this.match(TokenType.OR)){
+      const operator: Token = this.previous();
+      const right: Expr = this.and();
+      expr = new Logical(expr, operator, right);
+    }
+    
+    return expr;
+  }
+  
+  private and() : Expr {
+    let expr: Expr = this.equality();
+    
+    while(this.match(TokenType.AND)){
+      const operator: Token = this.previous();
+      const right: Expr = this.equality();
+      expr = new Logical(expr, operator, right);
+    }
+    
+    return expr;
+  }
+  
   private varDeclaration(): Stmt {
     {
       const name: Token = this.consume(
@@ -106,7 +136,7 @@ export class Parser {
   }
   
   private assignment() : Expr{
-    const expr: Expr = this.equality();
+    const expr: Expr = this.or();
     if(this.match(TokenType.EQUAL)){
       const equals: Token = this.previous();
       const value : Expr = this.assignment();

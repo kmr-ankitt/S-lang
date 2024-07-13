@@ -1,4 +1,4 @@
-import { Binary, Expr, Grouping, Literal, Unary, ExprVisitor, Variable, Assign } from "../Ast/Expr";
+import { Binary, Expr, Grouping, Literal, Unary, ExprVisitor, Variable, Assign, Logical } from "../Ast/Expr";
 import { Block, Expression, If, Print, Stmt, StmtVisitor, Var } from "../Ast/Stmt";
 import { Environment } from "../Environment/environment";
 import { Error } from "../Error/error";
@@ -81,6 +81,21 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
       return this.environment.get(expr.name);
   }
 
+  public visitLogicalExpr(expr: Logical): AnyValue {
+    const left: AnyValue = this.evaluate(expr.left);
+    
+    if (expr.operator.type === TokenType.OR) {
+      if (this.isTruthy(left))
+        return left;
+    }
+    else{
+      if (!this.isTruthy(left))
+        return left;
+    }
+    
+    return this.evaluate(expr.right);
+  }
+  
   public visitBinaryExpr(expr: Binary): AnyValue {
     const left: AnyValue = this.evaluate(expr.left);
     const right: AnyValue = this.evaluate(expr.right);

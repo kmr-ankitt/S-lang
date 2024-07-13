@@ -92,7 +92,7 @@ function defineAst(
       "Assign   : name: Token, value: Expr",
       // "Call     : callee: Expr, paren: Token, args: Expr[]",
       // "Getter   : obj: Expr, name: Token", // Named Getter instead of Get for consistency with Setter
-      // "Logical  : left: Expr, operator: Token, right: Expr",
+      "Logical  : left: Expr, operator: Token, right: Expr",
       // "Setter   : obj: Expr, name: Token, val: Expr", // Named Setter instead of Set cause of collision with the JS Set
       // "Super    : keyword: Token, method: Token",
       // "This     : keyword: Token",

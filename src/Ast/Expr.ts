@@ -7,10 +7,11 @@ export interface ExprVisitor<R> {
     visitLiteralExpr(expr: Literal): R;
     visitUnaryExpr(expr: Unary): R;
     visitAssignExpr(expr: Assign): R;
+    visitLogicalExpr(expr: Logical): R;
     visitVariableExpr(expr: Variable): R;
 }
 
-export type Expr = Binary | Grouping | Literal | Unary | Assign | Variable;
+export type Expr = Binary | Grouping | Literal | Unary | Assign | Logical | Variable;
 
 export class Binary {
     public left: Expr;
@@ -77,6 +78,22 @@ export class Assign {
 
     public accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitAssignExpr(this);
+    }
+}
+
+export class Logical {
+    public left: Expr;
+    public operator: Token;
+    public right: Expr;
+
+    public constructor(left: Expr, operator: Token, right: Expr) {
+        this.left = left;
+        this.operator = operator;
+        this.right = right;
+    }
+
+    public accept<R>(visitor: ExprVisitor<R>): R {
+        return visitor.visitLogicalExpr(this);
     }
 }
 
