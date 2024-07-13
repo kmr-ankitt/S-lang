@@ -21,7 +21,8 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
   }
 
   public visitExpressionStmt(stmt: Expression): void {
-      this.evaluate(stmt.expression);
+      const value = this.evaluate(stmt.expression);
+      console.log(this.stringify(value))
   }
 
   public visitPrintStmt(stmt: Print): void {
