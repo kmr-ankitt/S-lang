@@ -1,5 +1,5 @@
 import { Assign, Binary, Expr, Grouping, Literal, Unary, Variable } from "../Ast/Expr";
-import { Block, Expression, Print, Stmt, Var } from "../Ast/Stmt";
+import { Block, Expression, If, Print, Stmt, Var } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
@@ -36,7 +36,8 @@ export class Parser {
   private statement(): Stmt {
     if (this.match(TokenType.PRINT)) return this.printStatement();
     if (this.match(TokenType.LEFT_BRACE)) return new Block(this.block());
-
+    if (this.match(TokenType.IF)) return this.ifStatement();
+    
     return this.expressionStatement();
   }
 
@@ -73,6 +74,19 @@ export class Parser {
     return statements;
   }
 
+  private ifStatement() : Stmt{
+    this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
+    const condition: Expr = this.expression();
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.")
+    
+    const thenBranch: Stmt = this.statement();
+    let elseBranch = null;
+    if (this.match(TokenType.ELSE))
+      elseBranch = this.statement();
+    
+    return new If(condition, thenBranch, elseBranch);
+  }
+  
   private varDeclaration(): Stmt {
     {
       const name: Token = this.consume(

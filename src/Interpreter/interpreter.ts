@@ -1,5 +1,5 @@
 import { Binary, Expr, Grouping, Literal, Unary, ExprVisitor, Variable, Assign } from "../Ast/Expr";
-import { Block, Expression, Print, Stmt, StmtVisitor, Var } from "../Ast/Stmt";
+import { Block, Expression, If, Print, Stmt, StmtVisitor, Var } from "../Ast/Stmt";
 import { Environment } from "../Environment/environment";
 import { Error } from "../Error/error";
 import { RuntimeError } from "../Error/RuntimeError";
@@ -39,6 +39,13 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
   
   public visitBlockStmt(stmt: Block): void {
     this.executeBlock(stmt.statements, new Environment(this.environment));
+  }
+  
+  public visitIfStmt(stmt: If): void {
+    if (this.isTruthy(this.evaluate(stmt.condition)))
+      this.execute(stmt.thenBranch);
+    else if (stmt.elseBranch != null)
+      this.execute(stmt.elseBranch);
   }
   
   /*  Expression  Resolvers  */

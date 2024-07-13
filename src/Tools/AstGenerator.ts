@@ -110,7 +110,7 @@ function defineAst(
       "Expression : expression: Expr",
       "Print      : expression: Expr",
       //     "Func       : name: Token, params: Token[], body: Stmt[]",
-      //     "If         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
+      "If         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
       //     "Return     : keyword: Token, value: Expr | null",
           // initializer is Expr | null to stop typescript from complaining.
           "Var        : name: Token, initializer: Expr",

@@ -5,10 +5,11 @@ export interface StmtVisitor<R> {
     visitBlockStmt(stmt: Block): R;
     visitExpressionStmt(stmt: Expression): R;
     visitPrintStmt(stmt: Print): R;
+    visitIfStmt(stmt: If): R;
     visitVarStmt(stmt: Var): R;
 }
 
-export type Stmt = Block | Expression | Print | Var;
+export type Stmt = Block | Expression | Print | If | Var;
 
 export class Block {
     public statements: Stmt[];
@@ -43,6 +44,22 @@ export class Print {
 
     public accept<R>(visitor: StmtVisitor<R>): R {
         return visitor.visitPrintStmt(this);
+    }
+}
+
+export class If {
+    public condition: Expr;
+    public thenBranch: Stmt;
+    public elseBranch: Stmt | null;
+
+    public constructor(condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null) {
+        this.condition = condition;
+        this.thenBranch = thenBranch;
+        this.elseBranch = elseBranch;
+    }
+
+    public accept<R>(visitor: StmtVisitor<R>): R {
+        return visitor.visitIfStmt(this);
     }
 }
 
