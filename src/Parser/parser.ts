@@ -4,7 +4,6 @@ import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
 import { ParseError } from "./parseError";
-import { log } from "console";
 
 export class Parser {
   private readonly tokens: Token[];

@@ -1,4 +1,3 @@
-import { exitCode } from "process";
 import { Environment } from "../Environment/environment";
 import { Error } from "../Error/error";
 import { RuntimeError } from "../Error/RuntimeError";
