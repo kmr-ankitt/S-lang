@@ -129,30 +129,44 @@ export class Parser {
   private forStatement(): Stmt {
     this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
 
-    let initializer: Stmt;
-    if (this.match(TokenType.SEMICOLON)){}
-    else if (this.match(TokenType.VAR))
+    let initializer: Stmt | null = null;
+    if (this.match(TokenType.SEMICOLON)) {
+    } else if (this.match(TokenType.VAR)) {
       initializer = this.varDeclaration();
-    else
+    } else {
       initializer = this.expressionStatement();
-    
-    let condition;
-    if (!this.check(TokenType.SEMICOLON))
+    }
+
+    let condition: Expr | null = null;
+    if (!this.check(TokenType.SEMICOLON)) {
       condition = this.expression();
+    }
     this.consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
-    
-    let increment;
-    if (!this.check(TokenType.RIGHT_PAREN))
+
+    let increment: Expr | null = null;
+    if (!this.check(TokenType.RIGHT_PAREN)) {
       increment = this.expression();
+    }
     this.consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
+
     let body: Stmt = this.statement();
-    
-    if(increment != null){
-      body = new StmtBlock([body, new StmtExpression(increment)])
+
+    if (increment !== null) {
+      body = new StmtBlock([body, new StmtExpression(increment)]);
+    }
+
+    if (condition === null) {
+      condition = new ExprLiteral(true);
+    }
+    body = new StmtWhile(condition, body);
+
+    if (initializer !== null) {
+      body = new StmtBlock([initializer, body]);
     }
     
     return body;
   }
+
 
   private varDeclaration(): Stmt {
     {
