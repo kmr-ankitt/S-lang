@@ -22,7 +22,7 @@ export class Parser {
     } catch (error) {
       return new Literal(null);
     }
-  } 
+  }
 ***/
 
   parse(): Stmt[] {
@@ -40,7 +40,8 @@ export class Parser {
     if (this.match(TokenType.LEFT_BRACE)) return new Block(this.block());
     if (this.match(TokenType.IF)) return this.ifStatement();
     if (this.match(TokenType.WHILE)) return this.whileStatement();
-    
+    if (this.match(TokenType.FOR)) return this.forStatement();
+
     return this.expressionStatement();
   }
 
@@ -65,68 +66,95 @@ export class Parser {
     this.consume(TokenType.SEMICOLON, "Expect ';' after expression.");
     return new Expression(expr);
   }
-  
-  private block() : Stmt[]{
+
+  private block(): Stmt[] {
     const statements: Stmt[] = [];
-    
-    while(!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd())
-    {
+
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd()) {
       statements.push(this.declaration());
     }
     this.consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
     return statements;
   }
 
-  private ifStatement() : Stmt{
+  private ifStatement(): Stmt {
     this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.");
     const condition: Expr = this.expression();
     this.consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.")
-    
+
     const thenBranch: Stmt = this.statement();
     let elseBranch = null;
     if (this.match(TokenType.ELSE))
       elseBranch = this.statement();
-    
+
     return new If(condition, thenBranch, elseBranch);
   }
-  
+
   /** Since Lox is dynamically typed, we allow operands of any type and use truthiness to determine what each operand represents.
-  We apply similar reasoning to the result. Instead of promising to literally return true or false, a logic operator merely 
+  We apply similar reasoning to the result. Instead of promising to literally return true or false, a logic operator merely
   guarantees it will return a value with appropriate truthiness. ***/
-  
-  private or() : Expr {
+
+  private or(): Expr {
     let expr: Expr = this.and();
-    
-    while(this.match(TokenType.OR)){
+
+    while (this.match(TokenType.OR)) {
       const operator: Token = this.previous();
       const right: Expr = this.and();
       expr = new Logical(expr, operator, right);
     }
-    
+
     return expr;
   }
-  
-  private and() : Expr {
+
+  private and(): Expr {
     let expr: Expr = this.equality();
-    
-    while(this.match(TokenType.AND)){
+
+    while (this.match(TokenType.AND)) {
       const operator: Token = this.previous();
       const right: Expr = this.equality();
       expr = new Logical(expr, operator, right);
     }
-    
+
     return expr;
   }
-  
-  private whileStatement() : Stmt{
+
+  private whileStatement(): Stmt {
     this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
     const condition: Expr = this.expression();
     this.consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
     const body: Stmt = this.statement();
-    
+
     return new While(condition, body);
   }
-  
+
+  private forStatement(): Stmt {
+    this.consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.");
+
+    let initializer: Stmt;
+    if (this.match(TokenType.SEMICOLON)){}
+    else if (this.match(TokenType.VAR))
+      initializer = this.varDeclaration();
+    else
+      initializer = this.expressionStatement();
+    
+    let condition;
+    if (!this.check(TokenType.SEMICOLON))
+      condition = this.expression();
+    this.consume(TokenType.SEMICOLON, "Expect ';' after loop condition.");
+    
+    let increment;
+    if (!this.check(TokenType.RIGHT_PAREN))
+      increment = this.expression();
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses.");
+    let body: Stmt = this.statement();
+    
+    if(increment != null){
+      body = new Block([body, new Expression(increment)])
+    }
+    
+    return body;
+  }
+
   private varDeclaration(): Stmt {
     {
       const name: Token = this.consume(
@@ -144,16 +172,16 @@ export class Parser {
       return new Var(name, initializer);
     }
   }
-  
-  private assignment() : Expr{
+
+  private assignment(): Expr {
     const expr: Expr = this.or();
-    if(this.match(TokenType.EQUAL)){
+    if (this.match(TokenType.EQUAL)) {
       const equals: Token = this.previous();
-      const value : Expr = this.assignment();
-      
-      if(expr instanceof Variable){
-        const name : Token = (expr as any).name;
-        return new Assign(name , value);
+      const value: Expr = this.assignment();
+
+      if (expr instanceof Variable) {
+        const name: Token = (expr as any).name;
+        return new Assign(name, value);
       }
       this.error(equals, "Invalid assignment target.");
     }
@@ -238,7 +266,7 @@ export class Parser {
     if (this.match(TokenType.NUMBER, TokenType.STRING)) {
       return new Literal(this.previous().literal);
     }
-    if(this.match(TokenType.IDENTIFIER))
+    if (this.match(TokenType.IDENTIFIER))
       return new Variable(this.previous());
     if (this.match(TokenType.LEFT_PAREN)) {
       const expr: Expr = this.expression();
