@@ -85,18 +85,18 @@ function defineAst(
     outDir,
     "Expr",
     [
-      "Binary   : left: Expr, operator: Token, right: Expr",
-      "Grouping : expression: Expr",
-      "Literal  : value: AnyValue ",
-      "Unary    : operator: Token, right: Expr",
-      "Assign   : name: Token, value: Expr",
-      // "Call     : callee: Expr, paren: Token, args: Expr[]",
-      // "Getter   : obj: Expr, name: Token", // Named Getter instead of Get for consistency with Setter
-      "Logical  : left: Expr, operator: Token, right: Expr",
-      // "Setter   : obj: Expr, name: Token, val: Expr", // Named Setter instead of Set cause of collision with the JS Set
-      // "Super    : keyword: Token, method: Token",
-      // "This     : keyword: Token",
-      "Variable : name: Token",
+      "ExprBinary   : left: Expr, operator: Token, right: Expr",
+      "ExprGrouping : expression: Expr",
+      "ExprLiteral  : value: AnyValue ",
+      "ExprUnary    : operator: Token, right: Expr",
+      "ExprAssign   : name: Token, value: Expr",
+      // "ExprCall     : callee: Expr, paren: Token, args: Expr[]",
+      // "ExprGetter   : obj: Expr, name: Token", // Named Getter instead of Get for consistency with Setter
+      "ExprLogical  : left: Expr, operator: Token, right: Expr",
+      // "ExprSetter   : obj: Expr, name: Token, val: Expr", // Named Setter instead of Set cause of collision with the JS Set
+      // "ExprSuper    : keyword: Token, method: Token",
+      // "ExprThis     : keyword: Token",
+      "ExprVariable : name: Token",
     ],
     'import { Token } from "../Tokens/token"; \nimport { AnyValue } from "../Tokens/tokenType"; '
   );
@@ -105,16 +105,16 @@ function defineAst(
     outDir,
     "Stmt",
     [
-      "Block      : statements: Stmt[]",
-      //     "Class      : name: Token, superclass: Variable | null, methods: Func[]",
-      "Expression : expression: Expr",
-      "Print      : expression: Expr",
-      //     "Func       : name: Token, params: Token[], body: Stmt[]",
-      "If         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
-      //     "Return     : keyword: Token, value: Expr | null",
+      "StmtBlock      : statements: Stmt[]",
+      //     "StmtClass      : name: Token, superclass: Variable | null, methods: Func[]",
+      "StmtExpression : expression: Expr",
+      "StmtPrint      : expression: Expr",
+      //     "StmtFunc       : name: Token, params: Token[], body: Stmt[]",
+      "StmtIf         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
+      //     "StmtReturn     : keyword: Token, value: Expr | null",
           // initializer is Expr | null to stop typescript from complaining.
-      "Var        : name: Token, initializer: Expr",
-      "While      : condition: Expr, body: Stmt",
+      "StmtVar        : name: Token, initializer: Expr",
+      "StmtWhile      : condition: Expr, body: Stmt",
     ],
     'import { Expr } from "./Expr";\nimport { Token } from "../Tokens/token";'
   );
