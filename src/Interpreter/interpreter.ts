@@ -1,11 +1,11 @@
 import { exitCode } from "process";
-import { Binary, Expr, Grouping, Literal, Unary, ExprVisitor, Variable, Assign, Logical } from "../Ast/Expr";
-import { Block, Expression, If, Print, Stmt, StmtVisitor, Var, While } from "../Ast/Stmt";
 import { Environment } from "../Environment/environment";
 import { Error } from "../Error/error";
 import { RuntimeError } from "../Error/RuntimeError";
 import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
+import { Expr, ExprAssign, ExprBinary, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
+import { Stmt, StmtBlock, StmtExpression, StmtIf, StmtPrint, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
 
 export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
@@ -21,17 +21,17 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     }
   }
 
-  public visitExpressionStmt(stmt: Expression): void {
+  public visitStmtExpressionStmt(stmt: StmtExpression): void {
       const value = this.evaluate(stmt.expression);
       console.log(this.stringify(value))
   }
 
-  public visitPrintStmt(stmt: Print): void {
+  public visitStmtPrintStmt(stmt: StmtPrint): void {
     const value : AnyValue = this.evaluate(stmt.expression);
     console.log(this.stringify(value))
   }
 
-  public visitVarStmt(stmt: Var): void {
+  public visitStmtVarStmt(stmt: StmtVar): void {
     let value : AnyValue = null;
     if(stmt.initializer != null)
       value = this.evaluate(stmt.initializer);
@@ -39,39 +39,39 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     this.environment.define(stmt.name.lexeme, value);
   }
   
-  public visitBlockStmt(stmt: Block): void {
+  public visitStmtBlockStmt(stmt: StmtBlock): void {
     this.executeBlock(stmt.statements, new Environment(this.environment));
   }
   
-  public visitIfStmt(stmt: If): void {
+  public visitStmtIfStmt(stmt: StmtIf): void {
     if (this.isTruthy(this.evaluate(stmt.condition)))
       this.execute(stmt.thenBranch);
     else if (stmt.elseBranch != null)
       this.execute(stmt.elseBranch);
   }
   
-  public visitWhileStmt(stmt : While): void {
+  public visitStmtWhileStmt(stmt : StmtWhile): void {
     while (this.isTruthy(this.evaluate(stmt.condition)))
       this.execute(stmt.body);
   }
   
   /*  Expression  Resolvers  */
 
-  public visitAssignExpr(expr: Assign): AnyValue {
+  public visitExprAssignExpr(expr: ExprAssign): AnyValue {
     const value: AnyValue = this.evaluate(expr.value);
     this.environment.assign(expr.name, value);
     return value;
   }
 
-  public visitLiteralExpr(expr: Literal): AnyValue {
+  public visitExprLiteralExpr(expr: ExprLiteral): AnyValue {
     return expr.value;
   }
 
-  public visitGroupingExpr(expr: Grouping): AnyValue {
+  public visitExprGroupingExpr(expr: ExprGrouping): AnyValue {
     return this.evaluate(expr.expression);
   }
 
-  public visitUnaryExpr(expr: Unary): AnyValue {
+  public visitExprUnaryExpr(expr: ExprUnary): AnyValue {
     const right: AnyValue = this.evaluate(expr.right);
 
     switch (expr.operator.type) {
@@ -84,11 +84,11 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     return null;
   }
 
-  public visitVariableExpr(expr: Variable): AnyValue {
+  public visitExprVariableExpr(expr: ExprVariable): AnyValue {
       return this.environment.get(expr.name);
   }
 
-  public visitLogicalExpr(expr: Logical): AnyValue {
+  public visitExprLogicalExpr(expr: ExprLogical): AnyValue {
     const left: AnyValue = this.evaluate(expr.left);
     
     if (expr.operator.type === TokenType.OR) {
@@ -103,7 +103,7 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     return this.evaluate(expr.right);
   }
   
-  public visitBinaryExpr(expr: Binary): AnyValue {
+  public visitExprBinaryExpr(expr: ExprBinary): AnyValue {
     const left: AnyValue = this.evaluate(expr.left);
     const right: AnyValue = this.evaluate(expr.right);
 

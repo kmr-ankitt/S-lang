@@ -2,18 +2,18 @@ import { Token } from "../Tokens/token";
 import { AnyValue } from "../Tokens/tokenType"; ;
 
 export interface ExprVisitor<R> {
-    visitBinaryExpr(expr: Binary): R;
-    visitGroupingExpr(expr: Grouping): R;
-    visitLiteralExpr(expr: Literal): R;
-    visitUnaryExpr(expr: Unary): R;
-    visitAssignExpr(expr: Assign): R;
-    visitLogicalExpr(expr: Logical): R;
-    visitVariableExpr(expr: Variable): R;
+    visitExprBinaryExpr(expr: ExprBinary): R;
+    visitExprGroupingExpr(expr: ExprGrouping): R;
+    visitExprLiteralExpr(expr: ExprLiteral): R;
+    visitExprUnaryExpr(expr: ExprUnary): R;
+    visitExprAssignExpr(expr: ExprAssign): R;
+    visitExprLogicalExpr(expr: ExprLogical): R;
+    visitExprVariableExpr(expr: ExprVariable): R;
 }
 
-export type Expr = Binary | Grouping | Literal | Unary | Assign | Logical | Variable;
+export type Expr = ExprBinary | ExprGrouping | ExprLiteral | ExprUnary | ExprAssign | ExprLogical | ExprVariable;
 
-export class Binary {
+export class ExprBinary {
     public left: Expr;
     public operator: Token;
     public right: Expr;
@@ -25,11 +25,11 @@ export class Binary {
     }
 
     public accept<R>(visitor: ExprVisitor<R>): R {
-        return visitor.visitBinaryExpr(this);
+        return visitor.visitExprBinaryExpr(this);
     }
 }
 
-export class Grouping {
+export class ExprGrouping {
     public expression: Expr;
 
     public constructor(expression: Expr) {
@@ -37,11 +37,11 @@ export class Grouping {
     }
 
     public accept<R>(visitor: ExprVisitor<R>): R {
-        return visitor.visitGroupingExpr(this);
+        return visitor.visitExprGroupingExpr(this);
     }
 }
 
-export class Literal {
+export class ExprLiteral {
     public value: AnyValue;
 
     public constructor(value: AnyValue) {
@@ -49,11 +49,11 @@ export class Literal {
     }
 
     public accept<R>(visitor: ExprVisitor<R>): R {
-        return visitor.visitLiteralExpr(this);
+        return visitor.visitExprLiteralExpr(this);
     }
 }
 
-export class Unary {
+export class ExprUnary {
     public operator: Token;
     public right: Expr;
 
@@ -63,11 +63,11 @@ export class Unary {
     }
 
     public accept<R>(visitor: ExprVisitor<R>): R {
-        return visitor.visitUnaryExpr(this);
+        return visitor.visitExprUnaryExpr(this);
     }
 }
 
-export class Assign {
+export class ExprAssign {
     public name: Token;
     public value: Expr;
 
@@ -77,11 +77,11 @@ export class Assign {
     }
 
     public accept<R>(visitor: ExprVisitor<R>): R {
-        return visitor.visitAssignExpr(this);
+        return visitor.visitExprAssignExpr(this);
     }
 }
 
-export class Logical {
+export class ExprLogical {
     public left: Expr;
     public operator: Token;
     public right: Expr;
@@ -93,11 +93,11 @@ export class Logical {
     }
 
     public accept<R>(visitor: ExprVisitor<R>): R {
-        return visitor.visitLogicalExpr(this);
+        return visitor.visitExprLogicalExpr(this);
     }
 }
 
-export class Variable {
+export class ExprVariable {
     public name: Token;
 
     public constructor(name: Token) {
@@ -105,7 +105,7 @@ export class Variable {
     }
 
     public accept<R>(visitor: ExprVisitor<R>): R {
-        return visitor.visitVariableExpr(this);
+        return visitor.visitExprVariableExpr(this);
     }
 }
 

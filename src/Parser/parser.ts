@@ -1,6 +1,5 @@
-import { isJSDocClassTag } from "typescript";
-import { Assign, Binary, Expr, Grouping, Literal, Logical, Unary, Variable } from "../Ast/Expr";
-import { Block, Expression, If, Print, Stmt, Var, While } from "../Ast/Stmt";
+import { Expr, ExprAssign, ExprBinary, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable } from "../Ast/Expr";
+import { Stmt, StmtBlock, StmtExpression, StmtIf, StmtPrint, StmtVar, StmtWhile } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
@@ -37,7 +36,7 @@ export class Parser {
 
   private statement(): Stmt {
     if (this.match(TokenType.PRINT)) return this.printStatement();
-    if (this.match(TokenType.LEFT_BRACE)) return new Block(this.block());
+    if (this.match(TokenType.LEFT_BRACE)) return new StmtBlock(this.block());
     if (this.match(TokenType.IF)) return this.ifStatement();
     if (this.match(TokenType.WHILE)) return this.whileStatement();
     if (this.match(TokenType.FOR)) return this.forStatement();
@@ -51,20 +50,20 @@ export class Parser {
       return this.statement();
     } catch (error: any) {
       this.synchronize();
-      return new Expression(new Literal(null));
+      return new StmtExpression(new ExprLiteral(null));
     }
   }
 
   private printStatement(): Stmt {
     const value: Expr = this.expression();
     this.consume(TokenType.SEMICOLON, "Expect ';' after value.");
-    return new Print(value);
+    return new StmtPrint(value);
   }
 
   private expressionStatement(): Stmt {
     const expr: Expr = this.expression();
     this.consume(TokenType.SEMICOLON, "Expect ';' after expression.");
-    return new Expression(expr);
+    return new StmtExpression(expr);
   }
 
   private block(): Stmt[] {
@@ -87,7 +86,7 @@ export class Parser {
     if (this.match(TokenType.ELSE))
       elseBranch = this.statement();
 
-    return new If(condition, thenBranch, elseBranch);
+    return new StmtIf(condition, thenBranch, elseBranch);
   }
 
   /** Since Lox is dynamically typed, we allow operands of any type and use truthiness to determine what each operand represents.
@@ -100,7 +99,7 @@ export class Parser {
     while (this.match(TokenType.OR)) {
       const operator: Token = this.previous();
       const right: Expr = this.and();
-      expr = new Logical(expr, operator, right);
+      expr = new ExprLogical(expr, operator, right);
     }
 
     return expr;
@@ -112,7 +111,7 @@ export class Parser {
     while (this.match(TokenType.AND)) {
       const operator: Token = this.previous();
       const right: Expr = this.equality();
-      expr = new Logical(expr, operator, right);
+      expr = new ExprLogical(expr, operator, right);
     }
 
     return expr;
@@ -124,7 +123,7 @@ export class Parser {
     this.consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.");
     const body: Stmt = this.statement();
 
-    return new While(condition, body);
+    return new StmtWhile(condition, body);
   }
 
   private forStatement(): Stmt {
@@ -149,7 +148,7 @@ export class Parser {
     let body: Stmt = this.statement();
     
     if(increment != null){
-      body = new Block([body, new Expression(increment)])
+      body = new StmtBlock([body, new StmtExpression(increment)])
     }
     
     return body;
@@ -162,14 +161,14 @@ export class Parser {
         "Expect variable name."
       );
 
-      let initializer: Expr = new Literal(null);
+      let initializer: Expr = new ExprLiteral(null);
       if (this.match(TokenType.EQUAL)) initializer = this.expression();
 
       this.consume(
         TokenType.SEMICOLON,
         "Expect ';' after variable declaration."
       );
-      return new Var(name, initializer);
+      return new StmtVar(name, initializer);
     }
   }
 
@@ -179,9 +178,9 @@ export class Parser {
       const equals: Token = this.previous();
       const value: Expr = this.assignment();
 
-      if (expr instanceof Variable) {
+      if (expr instanceof ExprVariable) {
         const name: Token = (expr as any).name;
-        return new Assign(name, value);
+        return new ExprAssign(name, value);
       }
       this.error(equals, "Invalid assignment target.");
     }
@@ -194,7 +193,7 @@ export class Parser {
     while (this.match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL)) {
       const operator: Token = this.previous();
       const right: Expr = this.comparison();
-      expr = new Binary(expr, operator, right);
+      expr = new ExprBinary(expr, operator, right);
     }
     return expr;
   }
@@ -214,7 +213,7 @@ export class Parser {
     ) {
       const operator: Token = this.previous();
       const right: Expr = this.term();
-      expr = new Binary(expr, operator, right);
+      expr = new ExprBinary(expr, operator, right);
     }
     return expr;
   }
@@ -227,7 +226,7 @@ export class Parser {
     while (this.match(TokenType.MINUS, TokenType.PLUS)) {
       const operator: Token = this.previous();
       const right: Expr = this.factor();
-      expr = new Binary(expr, operator, right);
+      expr = new ExprBinary(expr, operator, right);
     }
     return expr;
   }
@@ -240,7 +239,7 @@ export class Parser {
     while (this.match(TokenType.SLASH, TokenType.STAR)) {
       const operator: Token = this.previous();
       const right: Expr = this.unary();
-      expr = new Binary(expr, operator, right);
+      expr = new ExprBinary(expr, operator, right);
     }
     return expr;
   }
@@ -251,7 +250,7 @@ export class Parser {
     if (this.match(TokenType.BANG, TokenType.MINUS)) {
       const operator: Token = this.previous();
       const right: Expr = this.unary();
-      return new Unary(operator, right);
+      return new ExprUnary(operator, right);
     }
     return this.primary();
   }
@@ -259,19 +258,19 @@ export class Parser {
   //   primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
 
   private primary(): Expr {
-    if (this.match(TokenType.FALSE)) return new Literal(false);
-    if (this.match(TokenType.TRUE)) return new Literal(true);
-    if (this.match(TokenType.NIL)) return new Literal(null);
+    if (this.match(TokenType.FALSE)) return new ExprLiteral(false);
+    if (this.match(TokenType.TRUE)) return new ExprLiteral(true);
+    if (this.match(TokenType.NIL)) return new ExprLiteral(null);
 
     if (this.match(TokenType.NUMBER, TokenType.STRING)) {
-      return new Literal(this.previous().literal);
+      return new ExprLiteral(this.previous().literal);
     }
     if (this.match(TokenType.IDENTIFIER))
-      return new Variable(this.previous());
+      return new ExprVariable(this.previous());
     if (this.match(TokenType.LEFT_PAREN)) {
       const expr: Expr = this.expression();
       this.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
-      return new Grouping(expr);
+      return new ExprGrouping(expr);
     }
     throw this.error(this.peek(), "Expect expression.");
   }

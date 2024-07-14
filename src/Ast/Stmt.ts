@@ -2,17 +2,17 @@ import { Expr } from "./Expr";
 import { Token } from "../Tokens/token";
 
 export interface StmtVisitor<R> {
-    visitBlockStmt(stmt: Block): R;
-    visitExpressionStmt(stmt: Expression): R;
-    visitPrintStmt(stmt: Print): R;
-    visitIfStmt(stmt: If): R;
-    visitVarStmt(stmt: Var): R;
-    visitWhileStmt(stmt: While): R;
+    visitStmtBlockStmt(stmt: StmtBlock): R;
+    visitStmtExpressionStmt(stmt: StmtExpression): R;
+    visitStmtPrintStmt(stmt: StmtPrint): R;
+    visitStmtIfStmt(stmt: StmtIf): R;
+    visitStmtVarStmt(stmt: StmtVar): R;
+    visitStmtWhileStmt(stmt: StmtWhile): R;
 }
 
-export type Stmt = Block | Expression | Print | If | Var | While;
+export type Stmt = StmtBlock | StmtExpression | StmtPrint | StmtIf | StmtVar | StmtWhile;
 
-export class Block {
+export class StmtBlock {
     public statements: Stmt[];
 
     public constructor(statements: Stmt[]) {
@@ -20,11 +20,11 @@ export class Block {
     }
 
     public accept<R>(visitor: StmtVisitor<R>): R {
-        return visitor.visitBlockStmt(this);
+        return visitor.visitStmtBlockStmt(this);
     }
 }
 
-export class Expression {
+export class StmtExpression {
     public expression: Expr;
 
     public constructor(expression: Expr) {
@@ -32,11 +32,11 @@ export class Expression {
     }
 
     public accept<R>(visitor: StmtVisitor<R>): R {
-        return visitor.visitExpressionStmt(this);
+        return visitor.visitStmtExpressionStmt(this);
     }
 }
 
-export class Print {
+export class StmtPrint {
     public expression: Expr;
 
     public constructor(expression: Expr) {
@@ -44,11 +44,11 @@ export class Print {
     }
 
     public accept<R>(visitor: StmtVisitor<R>): R {
-        return visitor.visitPrintStmt(this);
+        return visitor.visitStmtPrintStmt(this);
     }
 }
 
-export class If {
+export class StmtIf {
     public condition: Expr;
     public thenBranch: Stmt;
     public elseBranch: Stmt | null;
@@ -60,11 +60,11 @@ export class If {
     }
 
     public accept<R>(visitor: StmtVisitor<R>): R {
-        return visitor.visitIfStmt(this);
+        return visitor.visitStmtIfStmt(this);
     }
 }
 
-export class Var {
+export class StmtVar {
     public name: Token;
     public initializer: Expr;
 
@@ -74,11 +74,11 @@ export class Var {
     }
 
     public accept<R>(visitor: StmtVisitor<R>): R {
-        return visitor.visitVarStmt(this);
+        return visitor.visitStmtVarStmt(this);
     }
 }
 
-export class While {
+export class StmtWhile {
     public condition: Expr;
     public body: Stmt;
 
@@ -88,7 +88,7 @@ export class While {
     }
 
     public accept<R>(visitor: StmtVisitor<R>): R {
-        return visitor.visitWhileStmt(this);
+        return visitor.visitStmtWhileStmt(this);
     }
 }
 
