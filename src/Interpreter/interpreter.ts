@@ -20,11 +20,9 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     }
   }
 
-  public visitStmtExpressionStmt(stmt: StmtExpression): void {
-      const value = this.evaluate(stmt.expression);
-      console.log(this.stringify(value))
+  visitStmtExpressionStmt(stmt: StmtExpression): void {
+    this.evaluate(stmt.expression);
   }
-
   public visitStmtPrintStmt(stmt: StmtPrint): void {
     const value : AnyValue = this.evaluate(stmt.expression);
     console.log(this.stringify(value))
@@ -50,7 +48,7 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
   }
   
   public visitStmtWhileStmt(stmt : StmtWhile): void {
-    while (this.isTruthy(this.evaluate(stmt.condition)))
+    while (this.isTruthy(this.evaluate(stmt.condition))) 
       this.execute(stmt.body);
   }
   
