@@ -5,12 +5,17 @@ import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
 import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
 import { Stmt, StmtBlock, StmtExpression, StmtIf, StmtPrint, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
-import { slangCallable } from "../SlangCallable/slangCallable";
+import { Clock, slangCallable } from "../SlangCallable/slangCallable";
 
 export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
-  private environment: Environment = new Environment();
+  readonly globals: Environment = new Environment();
+  private environment: Environment = this.globals;
 
+  constructor(){
+    this.globals.define("clock", new Clock);
+  }
+  
   interpret(statements: Stmt[]): void {
     try {
       for (const statement of statements) {
