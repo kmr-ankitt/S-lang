@@ -7,11 +7,12 @@ export interface ExprVisitor<R> {
     visitExprLiteralExpr(expr: ExprLiteral): R;
     visitExprUnaryExpr(expr: ExprUnary): R;
     visitExprAssignExpr(expr: ExprAssign): R;
+    visitExprCallExpr(expr: ExprCall): R;
     visitExprLogicalExpr(expr: ExprLogical): R;
     visitExprVariableExpr(expr: ExprVariable): R;
 }
 
-export type Expr = ExprBinary | ExprGrouping | ExprLiteral | ExprUnary | ExprAssign | ExprLogical | ExprVariable;
+export type Expr = ExprBinary | ExprGrouping | ExprLiteral | ExprUnary | ExprAssign | ExprCall | ExprLogical | ExprVariable;
 
 export class ExprBinary {
     public left: Expr;
@@ -78,6 +79,22 @@ export class ExprAssign {
 
     public accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitExprAssignExpr(this);
+    }
+}
+
+export class ExprCall {
+    public callee: Expr;
+    public paren: Token;
+    public args: Expr[];
+
+    public constructor(callee: Expr, paren: Token, args: Expr[]) {
+        this.callee = callee;
+        this.paren = paren;
+        this.args = args;
+    }
+
+    public accept<R>(visitor: ExprVisitor<R>): R {
+        return visitor.visitExprCallExpr(this);
     }
 }
 

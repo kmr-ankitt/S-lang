@@ -1,4 +1,4 @@
-import { Expr, ExprAssign, ExprBinary, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable } from "../Ast/Expr";
+import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable } from "../Ast/Expr";
 import { Stmt, StmtBlock, StmtExpression, StmtIf, StmtPrint, StmtVar, StmtWhile } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
@@ -162,7 +162,7 @@ export class Parser {
     if (initializer !== null) {
       body = new StmtBlock([initializer, body]);
     }
-    
+
     return body;
   }
 
@@ -265,7 +265,7 @@ export class Parser {
       const right: Expr = this.unary();
       return new ExprUnary(operator, right);
     }
-    return this.primary();
+    return this.call();
   }
 
   //   primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
@@ -286,6 +286,19 @@ export class Parser {
       return new ExprGrouping(expr);
     }
     throw this.error(this.peek(), "Expect expression.");
+  }
+
+  private call(): Expr {
+    let expr: Expr = this.primary();
+
+    while (true) {
+      if (this.match(TokenType.LEFT_PAREN))
+        expr = this.finishCall(expr);
+      else
+        break;
+    }
+
+    return expr;
   }
 
   /****** Helper Functions ******/
@@ -347,6 +360,20 @@ export class Parser {
   private error(token: Token, message: string): ParseError {
     Error.error(token, message);
     return new ParseError();
+  }
+
+  private finishCall(callee: Expr): Expr {
+    let args: Expr[] = [];
+    if (!this.check(TokenType.RIGHT_PAREN)) {
+      do {
+        if (args.length >= 255)
+          this.error(this.peek(), "Can't have more than 255 arguments.");
+        args.push(this.expression());
+      } while (this.match(TokenType.COMMA));
+    }
+    
+    const paren: Token = this.consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+    return new ExprCall(callee, paren, args);
   }
 
   // Synchronize the parser to the end of the file. It discards tokens until it thinks it has found a statement boundary.
