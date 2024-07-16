@@ -4,8 +4,9 @@ import { RuntimeError } from "../Error/RuntimeError";
 import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
 import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
-import { Stmt, StmtBlock, StmtExpression, StmtIf, StmtPrint, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
-import { Clock, slangCallable } from "../SlangCallable/slangCallable";
+import { Stmt, StmtBlock, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
+import { Clock, slangCallable } from "../SlangHelper/slangCallable";
+import { slangFunction } from "../SlangHelper/slangFunction";
 
 export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
@@ -58,6 +59,11 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
       this.execute(stmt.body);
   }
 
+  public visitStmtFuncStmt(stmt: StmtFunc): void {
+     let func : slangFunction = new slangFunction(stmt);
+    this.environment.define(stmt.name.lexeme, func);
+  }
+  
   /*  Expression  Resolvers  */
 
   public visitExprAssignExpr(expr: ExprAssign): AnyValue {
@@ -217,7 +223,7 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     stmt.accept(this);
   }
 
-  private executeBlock(statements: Stmt[], environment: Environment) {
+  executeBlock(statements: Stmt[], environment: Environment) {
     const previous: Environment = this.environment;
     try {
       this.environment = environment;
