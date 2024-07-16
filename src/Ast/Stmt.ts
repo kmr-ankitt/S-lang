@@ -5,12 +5,13 @@ export interface StmtVisitor<R> {
     visitStmtBlockStmt(stmt: StmtBlock): R;
     visitStmtExpressionStmt(stmt: StmtExpression): R;
     visitStmtPrintStmt(stmt: StmtPrint): R;
+    visitStmtFuncStmt(stmt: StmtFunc): R;
     visitStmtIfStmt(stmt: StmtIf): R;
     visitStmtVarStmt(stmt: StmtVar): R;
     visitStmtWhileStmt(stmt: StmtWhile): R;
 }
 
-export type Stmt = StmtBlock | StmtExpression | StmtPrint | StmtIf | StmtVar | StmtWhile;
+export type Stmt = StmtBlock | StmtExpression | StmtPrint | StmtFunc | StmtIf | StmtVar | StmtWhile;
 
 export class StmtBlock {
     public statements: Stmt[];
@@ -45,6 +46,22 @@ export class StmtPrint {
 
     public accept<R>(visitor: StmtVisitor<R>): R {
         return visitor.visitStmtPrintStmt(this);
+    }
+}
+
+export class StmtFunc {
+    public name: Token;
+    public params: Token[];
+    public body: Stmt[];
+
+    public constructor(name: Token, params: Token[], body: Stmt[]) {
+        this.name = name;
+        this.params = params;
+        this.body = body;
+    }
+
+    public accept<R>(visitor: StmtVisitor<R>): R {
+        return visitor.visitStmtFuncStmt(this);
     }
 }
 

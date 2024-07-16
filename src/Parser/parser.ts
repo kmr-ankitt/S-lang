@@ -1,5 +1,5 @@
 import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable } from "../Ast/Expr";
-import { Stmt, StmtBlock, StmtExpression, StmtIf, StmtPrint, StmtVar, StmtWhile } from "../Ast/Stmt";
+import { Stmt, StmtBlock, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtVar, StmtWhile } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
@@ -45,6 +45,7 @@ export class Parser {
 
   private declaration(): Stmt {
     try {
+      if (this.match(TokenType.FUN)) return this.function("function");
       if (this.match(TokenType.VAR)) return this.varDeclaration();
       return this.statement();
     } catch (error: any) {
@@ -185,6 +186,24 @@ export class Parser {
     }
   }
 
+  private function(kind : string) : StmtFunc {
+    const name: Token = this.consume(TokenType.IDENTIFIER, `Expect ${kind} name.`);
+    this.consume(TokenType.LEFT_PAREN, "Expect '(' after " + kind + " name.");
+    let parameters: Token[] = [];
+    if(this.check(TokenType.RIGHT_PAREN)){
+      do {
+        if (parameters.length >= 255)
+          this.error(this.peek(), "Can't have more than 255 parameters.");
+        parameters.push(this.consume(TokenType.IDENTIFIER, "Expect parameter name."));
+      } while (this.match(TokenType.COMMA));
+    }
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+    
+    this.consume(TokenType.LEFT_BRACE, `Expect '{' before ${kind} body.`);
+    const body: Stmt[] = this.block();
+    return new StmtFunc(name, parameters, body);
+  }
+  
   private assignment(): Expr {
     const expr: Expr = this.or();
     if (this.match(TokenType.EQUAL)) {
