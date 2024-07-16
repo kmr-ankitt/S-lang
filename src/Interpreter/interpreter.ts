@@ -3,19 +3,20 @@ import { Error } from "../Error/error";
 import { RuntimeError } from "../Error/RuntimeError";
 import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
-import { Expr, ExprAssign, ExprBinary, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
+import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
 import { Stmt, StmtBlock, StmtExpression, StmtIf, StmtPrint, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
+import slangcallable from "../SlangCallable/slangCallable";
 
 export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
-  private environment : Environment = new Environment();
+  private environment: Environment = new Environment();
 
-  interpret(statements : Stmt[]) : void {
+  interpret(statements: Stmt[]): void {
     try {
-      for(const statement of statements) {
-        this.execute(statement); 
+      for (const statement of statements) {
+        this.execute(statement);
       }
-    } catch (error : any) {
+    } catch (error: any) {
       Error.runtimeError(error);
     }
   }
@@ -24,34 +25,34 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     this.evaluate(stmt.expression);
   }
   public visitStmtPrintStmt(stmt: StmtPrint): void {
-    const value : AnyValue = this.evaluate(stmt.expression);
+    const value: AnyValue = this.evaluate(stmt.expression);
     console.log(this.stringify(value))
   }
 
   public visitStmtVarStmt(stmt: StmtVar): void {
-    let value : AnyValue = null;
-    if(stmt.initializer != null)
+    let value: AnyValue = null;
+    if (stmt.initializer != null)
       value = this.evaluate(stmt.initializer);
 
     this.environment.define(stmt.name.lexeme, value);
   }
-  
+
   public visitStmtBlockStmt(stmt: StmtBlock): void {
     this.executeBlock(stmt.statements, new Environment(this.environment));
   }
-  
+
   public visitStmtIfStmt(stmt: StmtIf): void {
     if (this.isTruthy(this.evaluate(stmt.condition)))
       this.execute(stmt.thenBranch);
     else if (stmt.elseBranch != null)
       this.execute(stmt.elseBranch);
   }
-  
-  public visitStmtWhileStmt(stmt : StmtWhile): void {
-    while (this.isTruthy(this.evaluate(stmt.condition))) 
+
+  public visitStmtWhileStmt(stmt: StmtWhile): void {
+    while (this.isTruthy(this.evaluate(stmt.condition)))
       this.execute(stmt.body);
   }
-  
+
   /*  Expression  Resolvers  */
 
   public visitExprAssignExpr(expr: ExprAssign): AnyValue {
@@ -82,24 +83,34 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
   }
 
   public visitExprVariableExpr(expr: ExprVariable): AnyValue {
-      return this.environment.get(expr.name);
+    return this.environment.get(expr.name);
   }
 
   public visitExprLogicalExpr(expr: ExprLogical): AnyValue {
     const left: AnyValue = this.evaluate(expr.left);
-    
+
     if (expr.operator.type === TokenType.OR) {
       if (this.isTruthy(left))
         return left;
     }
-    else{
+    else {
       if (!this.isTruthy(left))
         return left;
     }
-    
+
     return this.evaluate(expr.right);
   }
-  
+
+  public visitExprCallExpr(expr: ExprCall): AnyValue {
+    let callee: AnyValue = this.evaluate(expr.callee);
+
+    let args: AnyValue[] = [];
+    args.map((arg) => { args.push(this.evaluate(arg)) });
+
+    let func: slangcallable = callee as slangcallable;
+    return func.call(this, args);
+  }
+
   public visitExprBinaryExpr(expr: ExprBinary): AnyValue {
     const left: AnyValue = this.evaluate(expr.left);
     const right: AnyValue = this.evaluate(expr.right);
@@ -125,7 +136,7 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
       case TokenType.SLASH:
         this.checkNumberOperands(expr.operator, left, right);
-        if(right == 0)
+        if (right == 0)
           throw new RuntimeError(expr.operator, "Cannot divide by zero.");
         return left / right;
 
@@ -190,20 +201,20 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     return object.toString();
   }
 
-  private execute(stmt : Stmt): void{
+  private execute(stmt: Stmt): void {
     stmt.accept(this);
   }
 
-  private executeBlock(statements : Stmt[], environment : Environment){
+  private executeBlock(statements: Stmt[], environment: Environment) {
     const previous: Environment = this.environment;
-    try{
+    try {
       this.environment = environment;
-      
-      statements.map((statement)=>{
+
+      statements.map((statement) => {
         this.execute(statement);
       })
     }
-    finally{
+    finally {
       this.environment = previous;
     }
   }
