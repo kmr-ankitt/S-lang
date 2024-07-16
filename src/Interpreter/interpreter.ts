@@ -5,7 +5,7 @@ import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
 import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
 import { Stmt, StmtBlock, StmtExpression, StmtIf, StmtPrint, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
-import slangcallable from "../SlangCallable/slangCallable";
+import { slangCallable } from "../SlangCallable/slangCallable";
 
 export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
@@ -107,7 +107,14 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     let args: AnyValue[] = [];
     args.map((arg) => { args.push(this.evaluate(arg)) });
 
-    let func: slangcallable = callee as slangcallable;
+    if(!(callee instanceof slangCallable)){
+      throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+    }
+    let func: slangCallable = callee as slangCallable;
+    
+    if(args.length != func.arity()){
+      throw new RuntimeError(expr.paren, `Expected ${func.arity()} arguments but got ${args.length}.`);
+    }
     return func.call(this, args);
   }
 
