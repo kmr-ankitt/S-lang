@@ -190,7 +190,7 @@ export class Parser {
     const name: Token = this.consume(TokenType.IDENTIFIER, `Expect ${kind} name.`);
     this.consume(TokenType.LEFT_PAREN, "Expect '(' after " + kind + " name.");
     let parameters: Token[] = [];
-    if(this.check(TokenType.RIGHT_PAREN)){
+    if(!this.check(TokenType.RIGHT_PAREN)){
       do {
         if (parameters.length >= 255)
           this.error(this.peek(), "Can't have more than 255 parameters.");

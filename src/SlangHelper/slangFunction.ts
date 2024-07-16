@@ -5,7 +5,7 @@ import { AnyValue } from "../Tokens/tokenType";
 import { slangCallable } from "./slangCallable";
 
 export class slangFunction extends slangCallable {
-  private declaration: StmtFunc;
+  private readonly declaration: StmtFunc;
   constructor(declaration: StmtFunc) {
     super();
     this.declaration = declaration;
@@ -19,9 +19,9 @@ export class slangFunction extends slangCallable {
     return "<fn " + this.declaration.name.lexeme + ">"; 
   }
   
-  public call(interpreter : Interpreter, args : AnyValue[]){
+  public call(interpreter : Interpreter, args : AnyValue[]) : AnyValue{
     let environment: Environment = new Environment(interpreter.globals);
-    for (var i = 0; i < this.declaration.params.length; i++){
+    for (let i = 0; i < this.declaration.params.length; i++){
       environment.define(this.declaration.params[i].lexeme, args[i]);
     }
     

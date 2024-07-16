@@ -13,10 +13,10 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
   readonly globals: Environment = new Environment();
   private environment: Environment = this.globals;
 
-  constructor(){
+  constructor() {
     this.globals.define("clock", new Clock);
   }
-  
+
   interpret(statements: Stmt[]): void {
     try {
       for (const statement of statements) {
@@ -60,10 +60,10 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
   }
 
   public visitStmtFuncStmt(stmt: StmtFunc): void {
-     let func : slangFunction = new slangFunction(stmt);
+    let func: slangFunction = new slangFunction(stmt);
     this.environment.define(stmt.name.lexeme, func);
   }
-  
+
   /*  Expression  Resolvers  */
 
   public visitExprAssignExpr(expr: ExprAssign): AnyValue {
@@ -116,14 +116,17 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     let callee: AnyValue = this.evaluate(expr.callee);
 
     let args: AnyValue[] = [];
-    args.map((arg) => { args.push(this.evaluate(arg)) });
-
-    if(!(callee instanceof slangCallable)){
+    
+    for (const arg of expr.args) {
+      args.push(this.evaluate(arg));
+    }
+    
+    if (!(callee instanceof slangCallable)) {
       throw new RuntimeError(expr.paren, "Can only call functions and classes.");
     }
     let func: slangCallable = callee as slangCallable;
-    
-    if(args.length != func.arity()){
+
+    if (args.length != func.arity()) {
       throw new RuntimeError(expr.paren, `Expected ${func.arity()} arguments but got ${args.length}.`);
     }
     return func.call(this, args);
