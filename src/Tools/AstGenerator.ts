@@ -111,7 +111,7 @@ function defineAst(
       "StmtPrint      : expression: Expr",
       "StmtFunc       : name: Token, params: Token[], body: Stmt[]",
       "StmtIf         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
-      //     "StmtReturn     : keyword: Token, value: Expr | null",
+      "StmtReturn     : keyword: Token, value: Expr | null",
           // initializer is Expr | null to stop typescript from complaining.
       "StmtVar        : name: Token, initializer: Expr",
       "StmtWhile      : condition: Expr, body: Stmt",

@@ -1,5 +1,5 @@
 import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable } from "../Ast/Expr";
-import { Stmt, StmtBlock, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtVar, StmtWhile } from "../Ast/Stmt";
+import { Stmt, StmtBlock, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtWhile } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
@@ -39,6 +39,7 @@ export class Parser {
     if (this.match(TokenType.IF)) return this.ifStatement();
     if (this.match(TokenType.WHILE)) return this.whileStatement();
     if (this.match(TokenType.FOR)) return this.forStatement();
+    if (this.match(TokenType.RETURN)) return this.returnStatement();
 
     return this.expressionStatement();
   }
@@ -167,6 +168,15 @@ export class Parser {
     return body;
   }
 
+  private returnStatement() : Stmt{
+    const keyword: Token = this.previous();
+    let value: Expr | null= null;
+    if (!this.check(TokenType.SEMICOLON))
+      value = this.expression();
+    
+    this.consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+    return new StmtReturn(keyword, value);
+  }
 
   private varDeclaration(): Stmt {
     {

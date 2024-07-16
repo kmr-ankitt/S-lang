@@ -4,9 +4,10 @@ import { RuntimeError } from "../Error/RuntimeError";
 import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
 import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
-import { Stmt, StmtBlock, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
+import { Stmt, StmtBlock, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
 import { Clock, slangCallable } from "../SlangHelper/slangCallable";
 import { slangFunction } from "../SlangHelper/slangFunction";
+import { returnError } from "../Error/returnError";
 
 export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
@@ -62,6 +63,14 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
   public visitStmtFuncStmt(stmt: StmtFunc): void {
     let func: slangFunction = new slangFunction(stmt);
     this.environment.define(stmt.name.lexeme, func);
+  }
+  
+  public visitStmtReturnStmt(stmt: StmtReturn): void {
+    let value: AnyValue = null;
+    if (stmt.value != null)
+      value = this.evaluate(stmt.value);
+    
+    throw new returnError(value);
   }
 
   /*  Expression  Resolvers  */
