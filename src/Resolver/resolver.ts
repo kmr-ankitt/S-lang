@@ -1,5 +1,6 @@
-import { ExprVisitor, Expr } from "../Ast/Expr";
-import { Stmt, StmtBlock, StmtVar, StmtVisitor } from "../Ast/Stmt";
+import { ExprVisitor, Expr, ExprVariable, ExprAssign } from "../Ast/Expr";
+import { Stmt, StmtBlock, StmtFunc, StmtVar, StmtVisitor } from "../Ast/Stmt";
+import { Error } from "../Error/error";
 import { Interpreter } from "../Interpreter/interpreter";
 import { Token } from "../Tokens/token";
 import { Stack } from "./stack";
@@ -25,6 +26,24 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     this.define(stmt.name);
   }
   
+  visitExprVariableExpr(expr: ExprVariable): void {
+    if(!this.scopes.isEmpty() && this.scopes.peek().get(expr.name.lexeme) === false ){
+      Error.error(expr.name, "Can't read local variable in its own initializer.");
+    }
+  }
+  
+  visitExprAssignExpr(expr: ExprAssign): void {
+    this.resolve(expr.value);
+    this.resolveLocal(expr, expr.name);
+  }
+  
+  visitStmtFuncStmt(stmt: StmtFunc): void {
+    this.declare(stmt.name);
+    this.define(stmt.name);
+    
+    this.resolveFunction(stmt);
+  }
+  
   // Helper Functions
   
   private beginScope(): void{
@@ -47,6 +66,25 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     if (this.scopes.isEmpty())
       return;
     this.scopes.peek().set(name.lexeme, true);
+  }
+
+  private resolveLocal(expr : Expr, name : Token) : void{
+    for (let i = this.scopes.size() - 1; i >= 0; i--){
+      if(this.scopes.get(i).has(name.lexeme)){
+        this.interpreter.resolve(expr, this.scopes.size() - 1 - i);
+        return;
+      }
+    }
+  } 
+  
+  private resolveFunction(func : StmtFunc){
+    this.beginScope();
+    func.params.map((param)=>{
+      this.declare(param);
+      this.define(param);
+    })
+    this.resolve(func.body);
+    this.endScope();
   }
   
   resolve(statements: Stmt[]): void;

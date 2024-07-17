@@ -20,4 +20,12 @@ export class Stack<T> {
   peek(): T  {
     return this.stack[this.stack.length - 1];
   }
+  
+  get(index : number) : T{
+    return this.stack[index];
+  }
+  
+  size(): number{
+    return this.stack.length;
+  }
 }   
