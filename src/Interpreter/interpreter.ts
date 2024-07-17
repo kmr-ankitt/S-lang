@@ -13,6 +13,7 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
   readonly globals: Environment = new Environment();
   private environment: Environment = this.globals;
+  private readonly locals: Map<Expr, number> = new Map < Expr, number>();
 
   constructor() {
     this.globals.define("clock", new Clock);
@@ -77,7 +78,11 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
   public visitExprAssignExpr(expr: ExprAssign): AnyValue {
     const value: AnyValue = this.evaluate(expr.value);
-    this.environment.assign(expr.name, value);
+    const distance = this.locals.get(expr);
+    if (distance != null)
+      this.environment.assignAt(distance, expr.name, value);
+    else
+      this.globals.assign(expr.name, value);
     return value;
   }
 
@@ -103,7 +108,7 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
   }
 
   public visitExprVariableExpr(expr: ExprVariable): AnyValue {
-    return this.environment.get(expr.name);
+    return this.lookUpVariable(expr.name, expr);
   }
 
   public visitExprLogicalExpr(expr: ExprLogical): AnyValue {
@@ -255,6 +260,18 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     throw new RuntimeError(operator, "Operands must be a number.");
   }
 
+  public resolve(expr : Expr , depth : number) : void{
+    this.locals.set(expr, depth);
+  }
+  
+  private lookUpVariable(name : Token , expr : Expr): AnyValue{
+    const distance = this.locals.get(expr);
+    if (distance != null)
+      return this.environment.getAt(distance, name.lexeme);
+    else
+      return this.globals.get(name);
+  }
+  
   private checkNumberOperands(
     operator: Token,
     left: AnyValue,
