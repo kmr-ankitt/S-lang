@@ -1,5 +1,5 @@
-import { ExprVisitor, Expr, ExprVariable, ExprAssign } from "../Ast/Expr";
-import { Stmt, StmtBlock, StmtFunc, StmtVar, StmtVisitor } from "../Ast/Stmt";
+import { ExprVisitor, Expr, ExprVariable, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary } from "../Ast/Expr";
+import { Stmt, StmtBlock, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Interpreter } from "../Interpreter/interpreter";
 import { Token } from "../Tokens/token";
@@ -13,6 +13,49 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     this.interpreter = interpreter;
   }
 
+  /**  Expression Resolving  **/
+
+  visitExprVariableExpr(expr: ExprVariable): void {
+    if (!this.scopes.isEmpty() && this.scopes.peek().get(expr.name.lexeme) === false) {
+      Error.error(expr.name, "Can't read local variable in its own initializer.");
+    }
+  }
+
+  visitExprAssignExpr(expr: ExprAssign): void {
+    this.resolve(expr.value);
+    this.resolveLocal(expr, expr.name);
+  }
+
+  visitExprBinaryExpr(expr: ExprBinary): void {
+    this.resolve(expr.left);
+    this.resolve(expr.right);
+  }
+
+  visitExprCallExpr(expr: ExprCall): void {
+    this.resolve(expr.callee);
+
+    expr.args.map((arg) => {
+      this.resolve(arg);
+    })
+  }
+
+  visitExprGroupingExpr(expr: ExprGrouping): void {
+    this.resolve(expr.expression);
+  }
+
+  visitExprLiteralExpr(expr: ExprLiteral): void {}
+  
+  visitExprLogicalExpr(expr: ExprLogical): void {
+    this.resolve(expr.left);
+    this.resolve(expr.right);
+  }
+  
+  visitExprUnaryExpr(expr: ExprUnary): void {
+    this.resolve(expr.right);
+  }
+
+  /**  Statement Resolving  **/
+
   visitStmtBlockStmt(stmt: StmtBlock): void {
     this.beginScope();
     this.resolve(stmt.statements);
@@ -25,68 +68,83 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
       this.resolve(stmt.initializer);
     this.define(stmt.name);
   }
-  
-  visitExprVariableExpr(expr: ExprVariable): void {
-    if(!this.scopes.isEmpty() && this.scopes.peek().get(expr.name.lexeme) === false ){
-      Error.error(expr.name, "Can't read local variable in its own initializer.");
-    }
-  }
-  
-  visitExprAssignExpr(expr: ExprAssign): void {
-    this.resolve(expr.value);
-    this.resolveLocal(expr, expr.name);
-  }
-  
+
+
   visitStmtFuncStmt(stmt: StmtFunc): void {
     this.declare(stmt.name);
     this.define(stmt.name);
-    
+
     this.resolveFunction(stmt);
   }
-  
+
+  visitStmtExpressionStmt(stmt: StmtExpression): void {
+    this.resolve(stmt.expression);
+  }
+
+  visitStmtIfStmt(stmt: StmtIf): void {
+    this.resolve(stmt.condition);
+    this.resolve(stmt.thenBranch);
+    if (stmt.elseBranch != null)
+      this.resolve(stmt.elseBranch);
+  }
+
+  visitStmtPrintStmt(stmt: StmtPrint): void {
+    this.resolve(stmt.expression);
+  }
+
+  visitStmtReturnStmt(stmt: StmtReturn): void {
+    if (stmt.value != null)
+      this.resolve(stmt.value);
+  }
+
+  visitStmtWhileStmt(stmt: StmtWhile): void {
+    this.resolve(stmt.condition);
+    this.resolve(stmt.body);
+  }
+
   // Helper Functions
-  
-  private beginScope(): void{
+
+  private beginScope(): void {
     this.scopes.push(new Map<string, Expr>);
   }
-  
-  private endScope(): void{
+
+  private endScope(): void {
     this.scopes.pop();
   }
-  
-  private declare(name : Token) : void{
+
+  private declare(name: Token): void {
     if (this.scopes.isEmpty())
       return;
-    
+
     let scope: Map<string, boolean> = this.scopes.peek();
     scope.set(name.lexeme, false);
   }
-  
-  private define(name: Token): void{
+
+  private define(name: Token): void {
     if (this.scopes.isEmpty())
       return;
     this.scopes.peek().set(name.lexeme, true);
   }
 
-  private resolveLocal(expr : Expr, name : Token) : void{
-    for (let i = this.scopes.size() - 1; i >= 0; i--){
-      if(this.scopes.get(i).has(name.lexeme)){
+  private resolveLocal(expr: Expr, name: Token): void {
+    for (let i = this.scopes.size() - 1; i >= 0; i--) {
+      if (this.scopes.get(i).has(name.lexeme)) {
         this.interpreter.resolve(expr, this.scopes.size() - 1 - i);
         return;
       }
     }
-  } 
-  
-  private resolveFunction(func : StmtFunc){
+  }
+
+  private resolveFunction(func: StmtFunc) {
     this.beginScope();
-    func.params.map((param)=>{
+    func.params.map((param) => {
       this.declare(param);
       this.define(param);
     })
     this.resolve(func.body);
     this.endScope();
   }
-  
+
   resolve(statements: Stmt[]): void;
   resolve(stmt: Stmt): void;
   resolve(expr: Expr): void;
@@ -108,7 +166,7 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
   private resolveStmt(stmt: Stmt): void {
     stmt.accept(this);
   }
-  
+
   private resolveExpr(expr: Expr): void {
     expr.accept(this);
   }
