@@ -5,14 +5,20 @@ import { Interpreter } from "../Interpreter/interpreter";
 import { Token } from "../Tokens/token";
 import { Stack } from "./stack";
 
+enum FunctionType {
+  NONE,
+  FUNCTION
+}
+
 export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
   private readonly interpreter: Interpreter;
   private readonly scopes: Stack<Map<string, boolean>> = new Stack<Map<string, boolean>>();
-
+  private currentFunction: FunctionType = FunctionType.NONE;
+  
   constructor(interpreter: Interpreter) {
     this.interpreter = interpreter;
   }
-
+  
   /**  Expression Resolving  **/
 
   visitExprVariableExpr(expr: ExprVariable): void {
@@ -74,7 +80,7 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     this.declare(stmt.name);
     this.define(stmt.name);
 
-    this.resolveFunction(stmt);
+    this.resolveFunction(stmt, FunctionType.FUNCTION);
   }
 
   visitStmtExpressionStmt(stmt: StmtExpression): void {
@@ -93,6 +99,9 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
   }
 
   visitStmtReturnStmt(stmt: StmtReturn): void {
+    if(this.currentFunction === FunctionType.NONE){
+      Error.error(stmt.keyword, "Can't return from top-level code");
+    }
     if (stmt.value != null)
       this.resolve(stmt.value);
   }
@@ -117,6 +126,8 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
       return;
 
     let scope: Map<string, boolean> = this.scopes.peek();
+    if (scope.has(name.lexeme))
+      Error.error(name, "Already a variable with this name in this scope.");
     scope.set(name.lexeme, false);
   }
 
@@ -135,7 +146,10 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     }
   }
 
-  private resolveFunction(func: StmtFunc) {
+  private resolveFunction(func: StmtFunc , type : FunctionType) {
+    let enclosingFunction = this.currentFunction;
+    this.currentFunction = type;
+    
     this.beginScope();
     func.params.map((param) => {
       this.declare(param);
@@ -143,6 +157,7 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     })
     this.resolve(func.body);
     this.endScope();
+    this.currentFunction = enclosingFunction;
   }
 
   resolve(statements: Stmt[]): void;

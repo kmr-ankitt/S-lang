@@ -66,6 +66,9 @@ export default class Slang {
     const resolver: Resolver = new Resolver(this.interpreter);
     resolver.resolve(statements);
     
+    if(this.hadError) 
+      return;
+    
     this.interpreter.interpret(statements);
   }
 }
