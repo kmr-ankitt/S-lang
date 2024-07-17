@@ -61,7 +61,7 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
   }
 
   public visitStmtFuncStmt(stmt: StmtFunc): void {
-    let func: slangFunction = new slangFunction(stmt);
+    let func: slangFunction = new slangFunction(stmt, this.environment);
     this.environment.define(stmt.name.lexeme, func);
   }
   

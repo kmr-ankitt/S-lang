@@ -7,9 +7,12 @@ import { slangCallable } from "./slangCallable";
 
 export class slangFunction extends slangCallable {
   private readonly declaration: StmtFunc;
-  constructor(declaration: StmtFunc) {
+  private readonly closure: Environment;
+  
+  constructor(declaration: StmtFunc, closure : Environment) {
     super();
     this.declaration = declaration;
+    this.closure = closure;
   }
 
   public arity(): number {
@@ -21,7 +24,7 @@ export class slangFunction extends slangCallable {
   }
 
   public call(interpreter: Interpreter, args: AnyValue[]): AnyValue {
-    let environment: Environment = new Environment(interpreter.globals);
+    let environment: Environment = new Environment(this.closure);
     for (let i = 0; i < this.declaration.params.length; i++) {
       environment.define(this.declaration.params[i].lexeme, args[i]);
     }
