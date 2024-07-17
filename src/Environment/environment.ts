@@ -17,7 +17,6 @@ export class Environment {
 
     if (this.enclosing != null)
       return this.enclosing.get(name);
-
     throw new RuntimeError(name, `Undefined variable ${name.lexeme}.`);
   }
 

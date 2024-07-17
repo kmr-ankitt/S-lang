@@ -9,7 +9,7 @@ export class Stack<T> {
     return this.stack.pop();
   }
 
-  isEmpty(): T | boolean {
+  isEmpty(): boolean {
     if (this.stack.length < 1)
       return true;
     else {

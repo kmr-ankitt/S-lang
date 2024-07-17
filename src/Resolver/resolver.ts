@@ -14,17 +14,19 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
   private readonly interpreter: Interpreter;
   private readonly scopes: Stack<Map<string, boolean>> = new Stack<Map<string, boolean>>();
   private currentFunction: FunctionType = FunctionType.NONE;
-  
+
   constructor(interpreter: Interpreter) {
     this.interpreter = interpreter;
   }
-  
+
   /**  Expression Resolving  **/
 
   visitExprVariableExpr(expr: ExprVariable): void {
-    if (!this.scopes.isEmpty() && this.scopes.peek().get(expr.name.lexeme) === false) {
+    if (!this.scopes.isEmpty() && (this.scopes.peek().get(expr.name.lexeme))=== false ) {
       Error.error(expr.name, "Can't read local variable in its own initializer.");
     }
+    
+    this.resolveLocal(expr, expr.name)
   }
 
   visitExprAssignExpr(expr: ExprAssign): void {
@@ -40,7 +42,7 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
   visitExprCallExpr(expr: ExprCall): void {
     this.resolve(expr.callee);
 
-    expr.args.map((arg) => {
+    expr.args.forEach((arg) => {
       this.resolve(arg);
     })
   }
@@ -49,13 +51,13 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     this.resolve(expr.expression);
   }
 
-  visitExprLiteralExpr(expr: ExprLiteral): void {}
-  
+  visitExprLiteralExpr(expr: ExprLiteral): void { }
+
   visitExprLogicalExpr(expr: ExprLogical): void {
     this.resolve(expr.left);
     this.resolve(expr.right);
   }
-  
+
   visitExprUnaryExpr(expr: ExprUnary): void {
     this.resolve(expr.right);
   }
@@ -99,7 +101,7 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
   }
 
   visitStmtReturnStmt(stmt: StmtReturn): void {
-    if(this.currentFunction === FunctionType.NONE){
+    if (this.currentFunction === FunctionType.NONE) {
       Error.error(stmt.keyword, "Can't return from top-level code");
     }
     if (stmt.value != null)
@@ -146,12 +148,12 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     }
   }
 
-  private resolveFunction(func: StmtFunc , type : FunctionType) {
+  private resolveFunction(func: StmtFunc, type: FunctionType) {
     let enclosingFunction = this.currentFunction;
     this.currentFunction = type;
-    
+
     this.beginScope();
-    func.params.map((param) => {
+    func.params.forEach((param) => {
       this.declare(param);
       this.define(param);
     })
@@ -160,38 +162,12 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     this.currentFunction = enclosingFunction;
   }
 
-  resolve(statements: Stmt[]): void;
-  resolve(stmt: Stmt): void;
-  resolve(expr: Expr): void;
-
   // Implementation of the overloaded methods
-  resolve(param: Stmt[] | Stmt | Expr): void {
-    if (Array.isArray(param)) {
-      // If it's an array of statements, resolve each statement
-      param.forEach(statement => this.resolve(statement));
-    } else if (this.isStmt(param)) {
-      // If it's a single statement, call the resolve for Stmt
-      this.resolveStmt(param);
-    } else if (this.isExpr(param)) {
-      // If it's a single expression, call the resolve for Expr
-      this.resolveExpr(param);
-    }
-  }
 
-  private resolveStmt(stmt: Stmt): void {
-    stmt.accept(this);
+  resolve(statements: Stmt[]): void
+  resolve(stmt: Stmt | Expr): void
+  resolve(target: Stmt[] | Stmt | Expr): void {
+    if (target instanceof Array) target.forEach((stmt) => this.resolve(stmt))
+    else target.accept(this)
   }
-
-  private resolveExpr(expr: Expr): void {
-    expr.accept(this);
-  }
-
-  private isStmt(param: any): param is Stmt {
-    return typeof param.accept === 'function' && 'someStmtSpecificProperty' in param;
-  }
-
-  private isExpr(param: any): param is Expr {
-    return typeof param.accept === 'function' && 'someExprSpecificProperty' in param;
-  }
-
 }
