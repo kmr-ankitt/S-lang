@@ -78,7 +78,6 @@ fun makeCounter() {
 var counter = makeCounter();
 counter(); // "1".
 counter(); // "2".
-**/
 
 
 var a = "global";
@@ -91,3 +90,12 @@ var a = "global";
   var a = "block";
   showA();
 }
+**/
+
+class DevonshireCream {
+  serveOn() {
+    return "Scones";
+  }
+}
+
+print DevonshireCream; // 

@@ -1,5 +1,5 @@
 import { ExprVisitor, Expr, ExprVariable, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary } from "../Ast/Expr";
-import { Stmt, StmtBlock, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
+import { Stmt, StmtBlock, StmtClass, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Interpreter } from "../Interpreter/interpreter";
 import { Token } from "../Tokens/token";
@@ -113,6 +113,11 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     this.resolve(stmt.body);
   }
 
+  visitStmtClassStmt(stmt: StmtClass): void {
+    this.declare(stmt.name);
+    this.define(stmt.name);
+  }
+  
   // Helper Functions
 
   private beginScope(): void {

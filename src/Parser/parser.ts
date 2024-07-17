@@ -1,5 +1,5 @@
 import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable } from "../Ast/Expr";
-import { Stmt, StmtBlock, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtWhile } from "../Ast/Stmt";
+import { Stmt, StmtBlock, StmtClass, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtWhile } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
 import { TokenType } from "../Tokens/tokenType";
@@ -46,9 +46,11 @@ export class Parser {
 
   private declaration(): Stmt {
     try {
+      if (this.match(TokenType.CLASS)) return this.classDeclaration();
       if (this.match(TokenType.FUN)) return this.function("function");
       if (this.match(TokenType.VAR)) return this.varDeclaration();
       return this.statement();
+      
     } catch (error: any) {
       this.synchronize();
       return new StmtExpression(new ExprLiteral(null));
@@ -194,6 +196,19 @@ export class Parser {
       );
       return new StmtVar(name, initializer);
     }
+  }
+  
+  private classDeclaration() : Stmt{
+    const name: Token = this.consume(TokenType.IDENTIFIER, "Expect class name.");
+    this.consume(TokenType.LEFT_BRACE, "Expect '{' before class body.")
+    let methods: StmtFunc[] = [];
+    while(!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd()){
+      methods.push(this.function("method"));
+    }
+    
+    this.consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
+    
+    return new StmtClass(name, methods);
   }
 
   private function(kind : string) : StmtFunc {

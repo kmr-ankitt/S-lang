@@ -3,6 +3,7 @@ import { Token } from "../Tokens/token";
 
 export interface StmtVisitor<R> {
     visitStmtBlockStmt(stmt: StmtBlock): R;
+    visitStmtClassStmt(stmt: StmtClass): R;
     visitStmtExpressionStmt(stmt: StmtExpression): R;
     visitStmtPrintStmt(stmt: StmtPrint): R;
     visitStmtFuncStmt(stmt: StmtFunc): R;
@@ -12,7 +13,7 @@ export interface StmtVisitor<R> {
     visitStmtWhileStmt(stmt: StmtWhile): R;
 }
 
-export type Stmt = StmtBlock | StmtExpression | StmtPrint | StmtFunc | StmtIf | StmtReturn | StmtVar | StmtWhile;
+export type Stmt = StmtBlock | StmtClass | StmtExpression | StmtPrint | StmtFunc | StmtIf | StmtReturn | StmtVar | StmtWhile;
 
 export class StmtBlock {
     public statements: Stmt[];
@@ -23,6 +24,20 @@ export class StmtBlock {
 
     public accept<R>(visitor: StmtVisitor<R>): R {
         return visitor.visitStmtBlockStmt(this);
+    }
+}
+
+export class StmtClass {
+    public name: Token;
+    public methods: StmtFunc[];
+
+    public constructor(name: Token, methods: StmtFunc[]) {
+        this.name = name;
+        this.methods = methods;
+    }
+
+    public accept<R>(visitor: StmtVisitor<R>): R {
+        return visitor.visitStmtClassStmt(this);
     }
 }
 

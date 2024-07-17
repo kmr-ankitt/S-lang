@@ -106,7 +106,7 @@ function defineAst(
     "Stmt",
     [
       "StmtBlock      : statements: Stmt[]",
-      //     "StmtClass      : name: Token, superclass: Variable | null, methods: Func[]",
+      "StmtClass      : name: Token, methods: StmtFunc[]",
       "StmtExpression : expression: Expr",
       "StmtPrint      : expression: Expr",
       "StmtFunc       : name: Token, params: Token[], body: Stmt[]",

@@ -4,10 +4,11 @@ import { RuntimeError } from "../Error/RuntimeError";
 import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
 import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
-import { Stmt, StmtBlock, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
+import { Stmt, StmtBlock, StmtClass, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
 import { Clock, slangCallable } from "../SlangHelper/slangCallable";
 import { slangFunction } from "../SlangHelper/slangFunction";
 import { returnError } from "../Error/returnError";
+import { slangClass } from "../Class/slangClass";
 
 export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
@@ -74,6 +75,12 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     throw new returnError(value);
   }
 
+  visitStmtClassStmt(stmt: StmtClass): void {
+    this.environment.define(stmt.name.lexeme, null);
+    let klass: slangClass = new slangClass(stmt.name.lexeme);
+    this.environment.assign(stmt.name, klass);
+  }
+  
   /*  Expression  Resolvers  */
 
   public visitExprAssignExpr(expr: ExprAssign): AnyValue {
