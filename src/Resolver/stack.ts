@@ -9,7 +9,15 @@ export class Stack<T> {
     return this.stack.pop();
   }
 
-  peek(): T | undefined {
+  isEmpty(): T | boolean {
+    if (this.stack.length < 1)
+      return true;
+    else {
+      return false;
+    }
+  }
+  
+  peek(): T  {
     return this.stack[this.stack.length - 1];
   }
 }   

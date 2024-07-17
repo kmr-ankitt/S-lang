@@ -1,11 +1,12 @@
 import { ExprVisitor, Expr } from "../Ast/Expr";
-import { Stmt, StmtBlock, StmtVisitor } from "../Ast/Stmt";
+import { Stmt, StmtBlock, StmtVar, StmtVisitor } from "../Ast/Stmt";
 import { Interpreter } from "../Interpreter/interpreter";
+import { Token } from "../Tokens/token";
 import { Stack } from "./stack";
 
 export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
   private readonly interpreter: Interpreter;
-  private readonly scopes: Stack<Map<string, Expr>> = new Stack<Map<string, Expr>>();
+  private readonly scopes: Stack<Map<string, boolean>> = new Stack<Map<string, boolean>>();
 
   constructor(interpreter: Interpreter) {
     this.interpreter = interpreter;
@@ -17,6 +18,13 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     this.endScope();
   }
 
+  visitStmtVarStmt(stmt: StmtVar): void {
+    this.declare(stmt.name);
+    if (stmt.initializer != null)
+      this.resolve(stmt.initializer);
+    this.define(stmt.name);
+  }
+  
   // Helper Functions
   
   private beginScope(): void{
@@ -25,6 +33,20 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
   
   private endScope(): void{
     this.scopes.pop();
+  }
+  
+  private declare(name : Token) : void{
+    if (this.scopes.isEmpty())
+      return;
+    
+    let scope: Map<string, boolean> = this.scopes.peek();
+    scope.set(name.lexeme, false);
+  }
+  
+  private define(name: Token): void{
+    if (this.scopes.isEmpty())
+      return;
+    this.scopes.peek().set(name.lexeme, true);
   }
   
   resolve(statements: Stmt[]): void;
