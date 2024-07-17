@@ -105,7 +105,7 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
   // Helper Functions
 
   private beginScope(): void {
-    this.scopes.push(new Map<string, Expr>);
+    this.scopes.push(new Map<string, boolean>);
   }
 
   private endScope(): void {

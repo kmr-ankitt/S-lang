@@ -3,6 +3,7 @@ import readline from "readline";
 import { Lexer } from "./Lexer/lexer";
 import { Parser } from "./Parser/parser";
 import { Interpreter } from "./Interpreter/interpreter";
+import { Resolver } from "./Resolver/resolver";
 
 export default class Slang {
 
@@ -61,6 +62,9 @@ export default class Slang {
 
     if(this.hadError) 
       return;
+    
+    const resolver: Resolver = new Resolver(this.interpreter);
+    resolver.resolve(statements);
     
     this.interpreter.interpret(statements);
   }

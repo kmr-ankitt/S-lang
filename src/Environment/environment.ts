@@ -4,9 +4,9 @@ import { AnyValue } from "../Tokens/tokenType";
 
 export class Environment {
   private readonly values = new Map<string, AnyValue>();
-  enclosing: Environment;
+  enclosing?: Environment;
 
-  constructor(enclosing: Environment) {
+  constructor(enclosing?: Environment) {
     this.enclosing = enclosing;
   }
 
@@ -28,7 +28,7 @@ export class Environment {
   ancestor(distance : number): Environment {
     let environment: Environment = this;
     for (let i = 0; i < distance; i++){
-        environment = environment.enclosing;
+        environment = environment.enclosing!;
     }
     return environment;
   }
