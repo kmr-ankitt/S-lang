@@ -4,7 +4,10 @@
   "description": "S-lang programming language",
   "main": "main.ts",
   "scripts": {
-    "test": "npx tsc"
+    "build": "tsc",
+    "slang": "pnpm run build && node dist/main.js",
+    "ast": "pnpm build && node dist/Tools/AstGenerator.js src/Ast",
+    "clean": "rm -rf dist"
   },
   "repository": {
     "type": "git",

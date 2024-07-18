@@ -1,4 +1,3 @@
-# Define directories
 TS_DIR = src
 OUT_DIR = dist
 
@@ -15,27 +14,17 @@ all: build run
 build:
 	npx tsc
 
-# Run the project
-run: build
-	node $(OUT_DIR)/main.js
-
+# Run the project with a user-provided file
 slang: build
-	node $(OUT_DIR)/main.js test.sx
+	node $(OUT_DIR)/main.js $(file)
 
+# Generate AST
 ast: build
 	node $(OUT_DIR)/Tools/AstGenerator.js src/Ast
-
-# Watch files and rebuild on changes
-watch:
-	npx tsc --watch
 
 # Clean the output directory
 clean:
 	rm -rf $(OUT_DIR)
-
-# Lint the project
-lint:
-	npx eslint $(TS_DIR) --ext .ts
 
 # Install dependencies
 install:
@@ -43,3 +32,7 @@ install:
 
 # PHONY targets
 .PHONY: all build run watch clean lint install
+
+# Handle arguments
+%:
+	@$(MAKE) run file=$@
