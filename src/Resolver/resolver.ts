@@ -7,7 +7,8 @@ import { Stack } from "./stack";
 
 enum FunctionType {
   NONE,
-  FUNCTION
+  FUNCTION,
+  METHOD
 }
 
 export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
@@ -125,6 +126,11 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
   visitStmtClassStmt(stmt: StmtClass): void {
     this.declare(stmt.name);
     this.define(stmt.name);
+    
+    stmt.methods.forEach((method : StmtFunc) => {
+      const declaration: FunctionType = FunctionType.METHOD;
+      this.resolveFunction(method, declaration);
+    })
   }
   
   // Helper Functions

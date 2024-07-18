@@ -78,7 +78,15 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
   visitStmtClassStmt(stmt: StmtClass): void {
     this.environment.define(stmt.name.lexeme, null);
-    let klass: slangClass = new slangClass(stmt.name.lexeme);
+    
+    let methods: Map<string, slangFunction> = new Map<string, slangFunction>;
+    
+    stmt.methods.forEach((method : StmtFunc)=>{
+      const func: slangFunction = new slangFunction(method, this.environment);
+      methods.set(method.name.lexeme, func);
+    })
+    
+    let klass: slangClass = new slangClass(stmt.name.lexeme, methods);
     this.environment.assign(stmt.name, klass);
   }
   
