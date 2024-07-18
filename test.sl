@@ -99,3 +99,7 @@ class DevonshireCream {
 }
 
 print DevonshireCream; // 
+
+class Bagel {}
+var bagel = Bagel();
+print bagel; // Prints "Bagel instance".

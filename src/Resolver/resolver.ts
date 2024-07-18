@@ -1,4 +1,4 @@
-import { ExprVisitor, Expr, ExprVariable, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary } from "../Ast/Expr";
+import { ExprVisitor, Expr, ExprVariable, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprGetter } from "../Ast/Expr";
 import { Stmt, StmtBlock, StmtClass, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Interpreter } from "../Interpreter/interpreter";
@@ -47,6 +47,10 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     })
   }
 
+  visitExprGetterExpr(expr: ExprGetter): void {
+    this.resolve(expr.obj);
+  }
+  
   visitExprGroupingExpr(expr: ExprGrouping): void {
     this.resolve(expr.expression);
   }

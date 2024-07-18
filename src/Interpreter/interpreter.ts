@@ -3,12 +3,13 @@ import { Error } from "../Error/error";
 import { RuntimeError } from "../Error/RuntimeError";
 import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
-import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
+import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGetter, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
 import { Stmt, StmtBlock, StmtClass, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
 import { Clock, slangCallable } from "../SlangHelper/slangCallable";
 import { slangFunction } from "../SlangHelper/slangFunction";
 import { returnError } from "../Error/returnError";
-import { slangClass } from "../Class/slangClass";
+import { slangClass } from "../SlangHelper/slangClass";
+import { slangInstance } from "../SlangHelper/slangInstance";
 
 export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
@@ -153,6 +154,14 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     return func.call(this, args);
   }
 
+  public visitExprGetterExpr(expr: ExprGetter): AnyValue {
+    const obj: any = this.evaluate(expr.obj);
+    if (obj instanceof slangInstance)
+      return obj.get(expr.name);
+    
+    throw new RuntimeError(expr.name, "Only instances have properties.")
+  }
+  
   public visitExprBinaryExpr(expr: ExprBinary): AnyValue {
     const left: AnyValue = this.evaluate(expr.left);
     const right: AnyValue = this.evaluate(expr.right);

@@ -1,4 +1,4 @@
-import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable } from "../Ast/Expr";
+import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGetter, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable } from "../Ast/Expr";
 import { Stmt, StmtBlock, StmtClass, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtWhile } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
@@ -338,6 +338,10 @@ export class Parser {
     while (true) {
       if (this.match(TokenType.LEFT_PAREN))
         expr = this.finishCall(expr);
+      else if (this.match(TokenType.DOT)) {
+        const name: Token = this.consume(TokenType.IDENTIFIER, "Expect property name after '.'.");
+        expr = new ExprGetter(expr, name);
+      }
       else
         break;
     }
