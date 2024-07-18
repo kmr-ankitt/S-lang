@@ -11,10 +11,16 @@ enum FunctionType {
   METHOD
 }
 
+enum classType{
+  NONE,
+  CLASS
+}
+
 export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
   private readonly interpreter: Interpreter;
   private readonly scopes: Stack<Map<string, boolean>> = new Stack<Map<string, boolean>>();
   private currentFunction: FunctionType = FunctionType.NONE;
+  private currentClass: classType = classType.NONE;
 
   constructor(interpreter: Interpreter) {
     this.interpreter = interpreter;
@@ -73,6 +79,8 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
   }
 
   visitExprThisExpr(expr: ExprThis): void {
+    if (this.currentClass === classType.NONE)
+      Error.error(expr.keyword, "Can't use 'this' outside of a class.");
     this.resolveLocal(expr, expr.keyword);
   }
   
@@ -128,6 +136,9 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
   }
 
   visitStmtClassStmt(stmt: StmtClass): void {
+    const enclosingClass = this.currentClass;
+    this.currentClass = classType.CLASS;
+    
     this.declare(stmt.name);
     this.define(stmt.name);
     
@@ -140,6 +151,8 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     })
     
     this.endScope();
+    
+    this.currentClass = enclosingClass;
   }
   
   // Helper Functions
