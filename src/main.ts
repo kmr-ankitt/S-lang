@@ -1,5 +1,6 @@
 import fs from "fs";
 import readline from "readline";
+import path from "path";
 import { Lexer } from "./Lexer/lexer";
 import { Parser } from "./Parser/parser";
 import { Interpreter } from "./Interpreter/interpreter";
@@ -7,13 +8,17 @@ import { Resolver } from "./Resolver/resolver";
 
 export default class Slang {
 
-  private static readonly interpreter : Interpreter = new Interpreter();
+  private static readonly interpreter: Interpreter = new Interpreter();
   static hadError: boolean = false;
   static hadRuntimeError: boolean = false;
 
-  //   This make the run Slang as file
-  static runFile(path: string) {
-    const buffer = fs.readFileSync(path);
+  static runFile(filePath: string) {
+    if (path.extname(filePath) !== '.sx') {
+      console.error('Error: Only .sx files are supported.');
+      process.exit(64);
+    }
+
+    const buffer = fs.readFileSync(filePath);
     this.run(buffer.toString());
 
     if (this.hadError) {
@@ -57,18 +62,17 @@ export default class Slang {
     const lexer = new Lexer(source);
     const tokens = lexer.scanTokens();
     const parser = new Parser(tokens);
-    const statements = parser.parse()
+    const statements = parser.parse();
 
-
-    if(this.hadError) 
+    if (this.hadError)
       return;
-    
+
     const resolver: Resolver = new Resolver(this.interpreter);
     resolver.resolve(statements);
-    
-    if(this.hadError) 
+
+    if (this.hadError)
       return;
-    
+
     this.interpreter.interpret(statements);
   }
 }
