@@ -4,6 +4,7 @@ import { returnError } from "../Error/returnError";
 import { Interpreter } from "../Interpreter/interpreter";
 import { AnyValue } from "../Tokens/tokenType";
 import { slangCallable } from "./slangCallable";
+import { slangInstance } from "./slangInstance";
 
 export class slangFunction extends slangCallable {
   private readonly declaration: StmtFunc;
@@ -23,6 +24,12 @@ export class slangFunction extends slangCallable {
     return "<fn " + this.declaration.name.lexeme + ">";
   }
 
+  bind(instance : slangInstance) : slangFunction{
+    const environment: Environment = new Environment(this.closure);
+    environment.define("this", instance);
+    return new slangFunction(this.declaration, environment);
+  }
+  
   public call(interpreter: Interpreter, args: AnyValue[]): AnyValue {
     let environment: Environment = new Environment(this.closure);
     for (let i = 0; i < this.declaration.params.length; i++) {

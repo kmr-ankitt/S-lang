@@ -18,7 +18,7 @@ export class slangInstance{
     
     const method = this.klass.findMethod(name.lexeme);
     if(method != null)
-      return method;
+      return method.bind(this);
     
     throw new RuntimeError(name, `Undefined property '${name.lexeme}'.`);
   }

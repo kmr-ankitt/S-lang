@@ -95,7 +95,7 @@ function defineAst(
       "ExprLogical  : left: Expr, operator: Token, right: Expr",
       "ExprSetter   : obj: Expr, name: Token, val: Expr",
       // "ExprSuper    : keyword: Token, method: Token",
-      // "ExprThis     : keyword: Token",
+      "ExprThis     : keyword: Token",
       "ExprVariable : name: Token",
     ],
     'import { Token } from "../Tokens/token"; \nimport { AnyValue } from "../Tokens/tokenType"; '

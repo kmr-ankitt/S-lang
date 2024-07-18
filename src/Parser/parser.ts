@@ -1,4 +1,4 @@
-import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGetter, ExprGrouping, ExprLiteral, ExprLogical, ExprSetter, ExprUnary, ExprVariable } from "../Ast/Expr";
+import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGetter, ExprGrouping, ExprLiteral, ExprLogical, ExprSetter, ExprThis, ExprUnary, ExprVariable } from "../Ast/Expr";
 import { Stmt, StmtBlock, StmtClass, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtWhile } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
@@ -323,6 +323,7 @@ export class Parser {
     if (this.match(TokenType.FALSE)) return new ExprLiteral(false);
     if (this.match(TokenType.TRUE)) return new ExprLiteral(true);
     if (this.match(TokenType.NIL)) return new ExprLiteral(null);
+    if (this.match(TokenType.THIS)) return new ExprThis(this.previous());
 
     if (this.match(TokenType.NUMBER, TokenType.STRING)) {
       return new ExprLiteral(this.previous().literal);

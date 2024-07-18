@@ -1,4 +1,4 @@
-import { ExprVisitor, Expr, ExprVariable, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprGetter, ExprSetter } from "../Ast/Expr";
+import { ExprVisitor, Expr, ExprVariable, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprGetter, ExprSetter, ExprThis } from "../Ast/Expr";
 import { Stmt, StmtBlock, StmtClass, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Interpreter } from "../Interpreter/interpreter";
@@ -72,6 +72,10 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     this.resolve(expr.right);
   }
 
+  visitExprThisExpr(expr: ExprThis): void {
+    this.resolveLocal(expr, expr.keyword);
+  }
+  
   /**  Statement Resolving  **/
 
   visitStmtBlockStmt(stmt: StmtBlock): void {
@@ -127,10 +131,15 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     this.declare(stmt.name);
     this.define(stmt.name);
     
+    this.beginScope();
+    this.scopes.peek().set("this", true);
+    
     stmt.methods.forEach((method : StmtFunc) => {
       const declaration: FunctionType = FunctionType.METHOD;
       this.resolveFunction(method, declaration);
     })
+    
+    this.endScope();
   }
   
   // Helper Functions

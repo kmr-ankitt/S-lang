@@ -3,7 +3,7 @@ import { Error } from "../Error/error";
 import { RuntimeError } from "../Error/RuntimeError";
 import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
-import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGetter, ExprGrouping, ExprLiteral, ExprLogical, ExprSetter, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
+import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGetter, ExprGrouping, ExprLiteral, ExprLogical, ExprSetter, ExprThis, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
 import { Stmt, StmtBlock, StmtClass, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
 import { Clock, slangCallable } from "../SlangHelper/slangCallable";
 import { slangFunction } from "../SlangHelper/slangFunction";
@@ -151,6 +151,10 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
       args.push(this.evaluate(arg));
     }
     
+    //todo remove
+    console.log(callee);
+    console.log(callee instanceof slangCallable);
+    // if (!(true)) {
     if (!(callee instanceof slangCallable)) {
       throw new RuntimeError(expr.paren, "Can only call functions and classes.");
     }
@@ -179,6 +183,10 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
     const value: AnyValue = this.evaluate(expr.val);
     obj.set(expr.name, value);
     return value;
+  }
+  
+  public visitExprThisExpr(expr: ExprThis) : AnyValue {
+    return this.lookUpVariable(expr.keyword, expr);
   }
   
   public visitExprBinaryExpr(expr: ExprBinary): AnyValue {
