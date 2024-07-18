@@ -151,11 +151,7 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
       args.push(this.evaluate(arg));
     }
     
-    //todo remove
-    console.log(callee);
-    console.log(callee instanceof slangCallable);
-    // if (!(true)) {
-    if (!(callee instanceof slangCallable)) {
+    if (!(callee instanceof slangCallable || callee instanceof slangClass)) {
       throw new RuntimeError(expr.paren, "Can only call functions and classes.");
     }
     let func: slangCallable = callee as slangCallable;
