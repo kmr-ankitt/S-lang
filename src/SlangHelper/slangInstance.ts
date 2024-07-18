@@ -17,6 +17,10 @@ export class slangInstance{
     throw new RuntimeError(name, `Undefined property '${name.lexeme}'.`);
   }
   
+  set(name : Token , value : AnyValue) : void{
+    this.fields.set(name.lexeme, value);
+  }
+  
   public toString() : string{
     return this.klass.name + " instance";
   }

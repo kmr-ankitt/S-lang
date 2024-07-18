@@ -93,7 +93,7 @@ function defineAst(
       "ExprCall     : callee: Expr, paren: Token, args: Expr[]",
       "ExprGetter   : obj: Expr, name: Token", 
       "ExprLogical  : left: Expr, operator: Token, right: Expr",
-      // "ExprSetter   : obj: Expr, name: Token, val: Expr", // Named Setter instead of Set cause of collision with the JS Set
+      "ExprSetter   : obj: Expr, name: Token, val: Expr",
       // "ExprSuper    : keyword: Token, method: Token",
       // "ExprThis     : keyword: Token",
       "ExprVariable : name: Token",

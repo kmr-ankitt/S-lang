@@ -1,4 +1,4 @@
-import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGetter, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable } from "../Ast/Expr";
+import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGetter, ExprGrouping, ExprLiteral, ExprLogical, ExprSetter, ExprUnary, ExprVariable } from "../Ast/Expr";
 import { Stmt, StmtBlock, StmtClass, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtWhile } from "../Ast/Stmt";
 import { Error } from "../Error/error";
 import { Token } from "../Tokens/token";
@@ -239,6 +239,11 @@ export class Parser {
         const name: Token = (expr as any).name;
         return new ExprAssign(name, value);
       }
+      else if(expr instanceof ExprGetter){
+        const get: ExprGetter = expr;
+        return new ExprSetter(get.obj, get.name, value); 
+      }
+      
       this.error(equals, "Invalid assignment target.");
     }
     return expr;

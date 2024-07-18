@@ -3,7 +3,7 @@ import { Error } from "../Error/error";
 import { RuntimeError } from "../Error/RuntimeError";
 import { Token } from "../Tokens/token";
 import { AnyValue, TokenType } from "../Tokens/tokenType";
-import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGetter, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
+import { Expr, ExprAssign, ExprBinary, ExprCall, ExprGetter, ExprGrouping, ExprLiteral, ExprLogical, ExprSetter, ExprUnary, ExprVariable, ExprVisitor } from "../Ast/Expr";
 import { Stmt, StmtBlock, StmtClass, StmtExpression, StmtFunc, StmtIf, StmtPrint, StmtReturn, StmtVar, StmtVisitor, StmtWhile } from "../Ast/Stmt";
 import { Clock, slangCallable } from "../SlangHelper/slangCallable";
 import { slangFunction } from "../SlangHelper/slangFunction";
@@ -160,6 +160,17 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
       return obj.get(expr.name);
     
     throw new RuntimeError(expr.name, "Only instances have properties.")
+  }
+  
+  public visitExprSetterExpr(expr: ExprSetter): AnyValue {
+    const obj: AnyValue = this.evaluate(expr.obj);
+    
+    if (!(obj instanceof slangInstance))
+      throw new RuntimeError(expr.name, "Only instances have fields.");
+    
+    const value: AnyValue = this.evaluate(expr.val);
+    obj.set(expr.name, value);
+    return value;
   }
   
   public visitExprBinaryExpr(expr: ExprBinary): AnyValue {
