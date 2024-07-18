@@ -33,7 +33,7 @@ export class Interpreter implements ExprVisitor<AnyValue>, StmtVisitor<void> {
 
   visitStmtExpressionStmt(stmt: StmtExpression): void {
     const val = this.evaluate(stmt.expression);
-    typeof val === "number" && console.log(val)
+    typeof val === "number" && console.log(val) 
   }
   public visitStmtPrintStmt(stmt: StmtPrint): void {
     const value: AnyValue = this.evaluate(stmt.expression);
