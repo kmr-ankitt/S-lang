@@ -13,16 +13,6 @@ export class Parser {
     this.tokens = tokens;
   }
 
-  /*** Was done to check if the parser is working
-  parse(): Expr {
-    try {
-      return this.expression();
-    } catch (error) {
-      return new Literal(null);
-    }
-  }
-***/
-
   parse(): Stmt[] {
     let statements: Stmt[] = [];
     while (!this.isAtEnd()) statements.push(this.declaration());
