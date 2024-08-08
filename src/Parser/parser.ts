@@ -82,7 +82,7 @@ export class Parser {
     return new StmtIf(condition, thenBranch, elseBranch);
   }
 
-  /** Since Lox is dynamically typed, we allow operands of any type and use truthiness to determine what each operand represents.
+  /** Since S-lang is dynamically typed, we allow operands of any type and use truthiness to determine what each operand represents.
   We apply similar reasoning to the result. Instead of promising to literally return true or false, a logic operator merely
   guarantees it will return a value with appropriate truthiness. ***/
 
