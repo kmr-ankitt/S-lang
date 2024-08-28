@@ -1,3 +1,5 @@
+<img src="https://github.com/user-attachments/assets/35e5c610-4e1e-4fff-ae89-2e3ea9b05c49" alt="drawing" style="width:200px" />
+
 # S-lang
 
 S-lang is a dynamically typed Language designed for simplicity and ease of use.
