@@ -1,4 +1,4 @@
-<img src="https://github.com/user-attachments/assets/35e5c610-4e1e-4fff-ae89-2e3ea9b05c49" alt="drawing" style="width:200px" />
+![slangBanner](https://github.com/user-attachments/assets/787387f0-07e0-4912-ab34-7e89b3aa8ebb)
 
 # S-lang
 
