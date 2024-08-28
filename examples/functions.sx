@@ -1,42 +1,42 @@
 fun sayHi(first, last) {
-  print "Hi, " + first + " " + last + "!";
+   echo "Hi, " + first + " " + last + "!";
 }
 
 sayHi("Dear", "Reader");
 
 fun fib(n) {
-  if (n <= 1) return n;
+  iffy (n <= 1) return n;
   return fib(n - 2) + fib(n - 1);
 }
 
-for (var i = 0; i < 20; i = i + 1) {
-  print fib(i);
+roll(let i = 0; i < 20; i = i + 1) {
+  echo fib(i);
 }
 
 
 fun makeCounter() {
-  var i = 0;
+  let i = 0;
   fun count() {
     i = i + 1;
-    print i;
+    echo i;
   }
 
   return count;
 }
 
-var counter = makeCounter();
+let counter = makeCounter();
 counter(); // "1".
 counter(); // "2".
 
 
-var a = "global";
+let a = "global";
 {
   fun showA() {
-    print a;
+    echo a;
   }
 
   showA();
-  var a = "block";
+  let a = "block";
   showA();
 }
 

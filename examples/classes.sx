@@ -1,32 +1,24 @@
-class DevonshireCream {
-  serveOn() {
-    return "Scones";
-  }
-}
+fam Bagel {}
+let bagel = Bagel();
+echo bagel; // Prints "Bagel instance".
 
-print DevonshireCream; // 
-
-class Bagel {}
-var bagel = Bagel();
-print bagel; // Prints "Bagel instance".
-
-class Bacon {
+fam Bacon {
   eat() {
-    print "Crunch crunch crunch!";
+    echo "Crunch crunch crunch!";
   }
 }
 
 Bacon().eat(); // Prints "Crunch crunch crunch!".
 
-print " ";
+echo " ";
 
-class Cake {
+fam Cake {
   taste() {
-    var adjective = "delicious";
-    print "The " + this.flavor + " cake is " + adjective + "!";
+    let adjective = "delicious";
+    echo "The " + this.flavor + " cake is " + adjective + "!";
   }
 }
 
-var cake = Cake();
+let cake = Cake();
 cake.flavor = "German chocolate";
 cake.taste(); // Prints "The German chocolate cake is delicious!".
