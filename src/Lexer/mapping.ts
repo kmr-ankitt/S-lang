@@ -1,8 +1,8 @@
 import { TokenType } from "../Tokens/tokenType";
 
 export const keywords: Record<string, TokenType> = {
-  n: TokenType.AND,            // "n" - short for "and"
-  crew: TokenType.CLASS,       // "crew" - a group, like a class
+  nd: TokenType.AND,           // "nd" - short for "and"
+  fam: TokenType.CLASS,        // "fam" - a group, like a class
   oof: TokenType.ELSE,         // "oof" - something went wrong, alternative path
   noi: TokenType.FALSE,        // "noi" - clear denial
   roll: TokenType.FOR,         // "roll" - rolling through a loop
@@ -11,7 +11,7 @@ export const keywords: Record<string, TokenType> = {
   void: TokenType.NIL,         // "void" - represents nothingness
   or: TokenType.OR,            // "or" - one or the other
   echo: TokenType.PRINT,       // "echo" - something that's repeated, like print
-  back: TokenType.RETURN,      // "back" - returning to something
+  return: TokenType.RETURN,    // "return" - returning to something
   top: TokenType.SUPER,        // "top" - something superior
   here: TokenType.THIS,        // "here" - refers to the current context
   real: TokenType.TRUE,        // "real" - simple affirmation
