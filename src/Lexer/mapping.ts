@@ -1,7 +1,7 @@
 import { TokenType } from "../Tokens/tokenType";
 
 export const keywords: Record<string, TokenType> = {
-  nd: TokenType.AND,           // "nd" - short for "and"
+  nd: TokenType.AND,          // "nd" - short for "and"
   fam: TokenType.CLASS,        // "fam" - a group, like a class
   oof: TokenType.ELSE,         // "oof" - something went wrong, alternative path
   noi: TokenType.FALSE,        // "noi" - clear denial
