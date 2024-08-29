@@ -46,5 +46,106 @@ make slang
 npm run slang FILE_DIRECTORY/FILE_NAME.sx
 ```
 
+## S-lang Documentation
+
+### File extension
+
+S-lang supports only `.sx` file extension.
+example: `main.zlt`
+
+
+### Hello, world!
+A simple hello world program in S-lang:
+```python
+echo "Hello, World!";
+```
+**Semi-colons at the end of every line is mandatory in S-lang.**
+
+### Datatypes
+S-lang has following datatypes
+
+#### Numbers
+There can be number literals which can be both integers and floating point numbers.
+
+examples: `1`, `2.5`, `9`
+
+#### Strings
+These are string literals defined inside `"`
+
+examples: `"S-lang"`, `"Strings are easy"`
+
+### Booleans
+These are boolean literals which can be either `real` or `noi`.
+
+examples: `real`, `noi`
+
+### Null Type
+S-lang has null datatype. It can be defined using the `void` keyword. All uninitialized variables are given the value of `void`. 
+
+examples: `void`
+
+
+### Operators
+
+S-lang has following operators:
+
+#### Assignment
+`=` - equals
+
+#### Unary operators
+`-` - Unary negation
+
+### Logical operators
+`nd` - logical AND
+
+`or`  - logical OR
+
+`!`   - logical NOT
+
+
+#### Arithmetic operators
+`+` - sum
+
+`-` - difference
+
+`*` - product 
+
+`/` - division 
+
+`%` - mod
+
+
+#### Comparison operators
+`==` - is equals
+
+`!=` - is not equals
+
+`>`  - is less than
+
+`>=` - is less than or equals
+
+`>`  - is greater than
+
+`>=` - is greater than or equals
+
+
+### Comments
+S-lang support both single line and multi line comment.
+
+- Single line comment
+```c
+// This is a single line comment.
+// The Lexer completely ignores any line starting with // 
+```
+
+- Multiline comment
+```c
+/*This is a mulit line comment in S-lang similar to that of C.*/
+```
+
+
+
+
+
 
 
