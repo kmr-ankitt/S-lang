@@ -2,7 +2,7 @@
 
 # S-lang
 
-S-lang is a dynamically typed Language designed for simplicity and ease of use.
+S-lang is a Dynamically typed Language Object Oriented programming language designed for simplicity and ease of use.
 
 ## Why
 
@@ -142,6 +142,118 @@ S-lang support both single line and multi line comment.
 ```c
 /*This is a mulit line comment in S-lang similar to that of C.*/
 ```
+
+### Variables 
+
+```rust
+let num = 15; // number
+let name = "radiohead"; // string
+let goat = real; // booleans
+let noob = noi; // booleans
+let nullable = void; // null type
+```
+
+
+### Logical operators
+```rust
+!real;  // false.
+!noi; // true.
+real nd noi; // false.
+real nd real;  // true.
+noi or noi; // false.
+real or noi;  // true.
+```
+
+### Control flow
+```rust
+let num = 15;
+
+iffy(num > 0){
+    echo "num is positive";
+}oof {
+    echo "num is negative";
+}
+```
+
+### Loops 
+```rust
+roll(let i = 0; i < 10; i = i + 1){
+    echo i;
+}
+
+let num = 1;
+loop(num > 0){
+    echo num;
+    num = num - 1;
+}
+```
+
+### Functions
+```rust
+fun add(a, b){
+    return a + b;
+}
+
+echo add(5, 10);
+```
+
+
+### Closures
+```rust
+fun addPair(a, b) {
+return a + b;
+}
+
+fun identity(a) {
+return a;
+}
+
+echo identity(addPair)(1, 2); // Prints "3".
+
+fun makeCounter(){
+    let c = 0;
+    fun counter(){
+        c = c + 1;
+        echo c;
+    }
+    return counter;
+}
+
+let counter1 = makeCounter();
+let counter2 = makeCounter();
+
+counter1(); // 1
+counter2(); // 1
+```
+
+## Classes
+S-lang has classes. It's a group of functions that can be used to create objects.
+
+- keywords: `fam` for class, `here` for current context or this keyword in other langs.
+
+```rust
+fam Bacon {
+  eat() {
+    echo "Crunch crunch crunch!";
+  }
+}
+
+Bacon().eat(); // Prints "Crunch crunch crunch!".
+
+fam Thing {
+  getCallback() {
+    fun localFunction() {
+      echo this;
+    }
+
+    return localFunction;
+  }
+}
+
+let callback = Thing().getCallback();
+callback();
+``` 
+
 
 
 
