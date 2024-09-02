@@ -51,7 +51,7 @@ npm run slang FILE_DIRECTORY/FILE_NAME.sx
 ### File extension
 
 S-lang supports only `.sx` file extension.
-example: `main.zlt`
+example: `main.sx`
 
 
 ### Hello, world!
