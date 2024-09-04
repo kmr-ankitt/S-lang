@@ -5,8 +5,8 @@
   "main": "main.ts",
   "scripts": {
     "build": "tsc",
-    "slang": "pnpm run build && node dist/main.js",
-    "ast": "pnpm build && node dist/Tools/AstGenerator.js src/Ast",
+    "slang": "npm run build && node dist/main.js",
+    "ast": "npm build && node dist/Tools/AstGenerator.js src/Ast",
     "clean": "rm -rf dist"
   },
   "repository": {
